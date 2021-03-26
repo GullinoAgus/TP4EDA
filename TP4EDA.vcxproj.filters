@@ -59,5 +59,93 @@
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Scenario.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F9.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F10.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F11.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F12.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F13.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F14.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wwalking\wwalk-F15.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F9.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\wjump\wjump-F10.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TP4EDA.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

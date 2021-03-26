@@ -155,6 +155,38 @@
     <ClInclude Include="ImGui\imstb_rectpack.h" />
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Scenario.png" />
+    <Image Include="Resources\wjump\wjump-F1.png" />
+    <Image Include="Resources\wjump\wjump-F10.png" />
+    <Image Include="Resources\wjump\wjump-F2.png" />
+    <Image Include="Resources\wjump\wjump-F3.png" />
+    <Image Include="Resources\wjump\wjump-F4.png" />
+    <Image Include="Resources\wjump\wjump-F5.png" />
+    <Image Include="Resources\wjump\wjump-F6.png" />
+    <Image Include="Resources\wjump\wjump-F7.png" />
+    <Image Include="Resources\wjump\wjump-F8.png" />
+    <Image Include="Resources\wjump\wjump-F9.png" />
+    <Image Include="Resources\wwalking\wwalk-F1.png" />
+    <Image Include="Resources\wwalking\wwalk-F10.png" />
+    <Image Include="Resources\wwalking\wwalk-F11.png" />
+    <Image Include="Resources\wwalking\wwalk-F12.png" />
+    <Image Include="Resources\wwalking\wwalk-F13.png" />
+    <Image Include="Resources\wwalking\wwalk-F14.png" />
+    <Image Include="Resources\wwalking\wwalk-F15.png" />
+    <Image Include="Resources\wwalking\wwalk-F2.png" />
+    <Image Include="Resources\wwalking\wwalk-F3.png" />
+    <Image Include="Resources\wwalking\wwalk-F4.png" />
+    <Image Include="Resources\wwalking\wwalk-F5.png" />
+    <Image Include="Resources\wwalking\wwalk-F6.png" />
+    <Image Include="Resources\wwalking\wwalk-F7.png" />
+    <Image Include="Resources\wwalking\wwalk-F8.png" />
+    <Image Include="Resources\wwalking\wwalk-F9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TP4EDA.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
