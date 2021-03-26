@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
-#include "Imgui/imgui.h"
-#include "Imgui/imgui_impl_allegro5.h"
-
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_allegro5.h"
+//
 int main(int, char**)
 {
     // Setup Allegro
