@@ -45,7 +45,7 @@
     <ClInclude Include="lib\ImGui\imstb_truetype.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="World.h">
+    <ClInclude Include="src\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -156,7 +156,7 @@
     <ClCompile Include="lib\ImGui\imgui_widgets.cpp">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="World.cpp">
+    <ClCompile Include="src\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

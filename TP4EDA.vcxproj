@@ -90,7 +90,7 @@
     <ClInclude Include="lib\ImGui\imstb_textedit.h" />
     <ClInclude Include="lib\ImGui\imstb_truetype.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="World.h" />
+    <ClInclude Include="src\World.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Scenario.png" />
@@ -131,7 +131,7 @@
     <ClCompile Include="lib\ImGui\imgui_tables.cpp" />
     <ClCompile Include="lib\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="src\TP4EDA.cpp" />
-    <ClCompile Include="World.cpp" />
+    <ClCompile Include="src\World.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
