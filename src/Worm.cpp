@@ -4,10 +4,18 @@
 
 #include "Worm.h"
 
+#define BITMAPHEIGHT 10 //TODO: Ver el alto del bitmap
+
 #define JUMP_INIT_SPEED (4.5)
 
 #define COS60           (0.5)                   /* cos(60°) == cos(pi/3) */
 #define SIN60           (0.866025403784438)     /* sin(60°) == sin(pi/3) */
+
+#define LATERAL_MOVE_SPEED 27.0
+#define FPS 50
+#define CONFIRMATION_FRAMES 5
+#define WALK_WARM_UP_FRAMES 3
+#define JUMP_WARM_UP_FRAMES 4
 
 #define JUMP_X_COORD    (JUMP_INIT_SPEED * COS60 * this->jumpTime)
 #define JUMP_Y_COORD    (JUMP_INIT_SPEED * SIN60 * this->jumpTime \
@@ -20,35 +28,32 @@ bool compareDouble(double a, double b)
 
 Worm::Worm(void) : position() 
 {
-    this->displacementDirection = WormStatesType::IDLE;
-    this->pointingDirection = WormPointing::NOT_INIT;
-    this->worldGravity = 0;
-    this->jumpInitialPosition = { 0 };
-    this->jumpDistance = 0;
-    this->jumpTime = 0;
+    this->pointingDirection = NOT_INIT;
+	this->frame = INVALID;
+	this->state = IDLE;
+	this->frameCounter = 0;
+    this->spd = { 0 };
 }
 
 Worm::Worm(Point_t initPosition, Point_t maxPosition, 
-    WormPointing direction, double gravity) 
+    WormPointing direction) 
     : position(initPosition.x, initPosition.y, maxPosition.x, maxPosition.y) 
 {
-    this->displacementDirection = WormStatesType::IDLE;
-    this->pointingDirection = direction;
+    this->pointingDirection = NOT_INIT;
+	this->state = IDLE;
+	this->frameCounter = 0;
+	this->spd = { 0 };
 
-    this->jumpInitialPosition = *(position.getPosition());
-    this->jumpTime = 0;
-
-    this->setGravity(gravity);
+	this->setInitialPointingDirection(direction);
+	this->frame = WF1;
 }
 
 Worm::~Worm() 
 {
-    displacementDirection = WormStatesType::IDLE;
-    pointingDirection = WormPointing::NOT_INIT;
-    worldGravity = 0;
-    jumpDistance = 0;
-    jumpInitialPosition = { 0 };
-    jumpTime = 0;
+    this->pointingDirection = NOT_INIT;
+	this->frameCounter = 0;
+	this->state = IDLE;
+	this->spd = { 0 };
 }
 
 bool Worm::setMaximumPosition(Point_t pos)
@@ -63,27 +68,22 @@ bool Worm::setInitialPosition(Point_t pos)
 
 bool Worm::setInitialPointingDirection(WormPointing dir)
 {
-    if (dir == WormPointing::NOT_INIT)
-    {
-        return false;
-    }
-
-    pointingDirection = dir;
+	if (dir == LEFT || dir == RIGHT) 
+	{
+		this->pointingDirection = dir;
+	}
+	else
+	{
+		std::cout << "Invalid direction!" << std::endl;
+		return false;
+	}
 
     return true;
 }
 
-bool Worm::setGravity(double gravity) 
+void Worm::setTouchingFloor(bool value)
 {
-    if (islessequal(gravity, 0.0)) 
-    {
-        return false;
-    }
-
-    this->worldGravity = gravity;
-    this->jumpDistance = 2 * JUMP_INIT_SPEED * SIN60 / gravity;
-
-    return true;
+	this->isTouchingFloor = value;
 }
 
 const Point_t* Worm::getCurrentPosition(void)
@@ -107,54 +107,98 @@ void Worm::getPointingDirection(WormPointing& direction)
     return;
 }
 
-bool Worm::move(WormPointing direction) 
+int Worm::getFrame(void)
 {
-    /* Either not initialized or a jump is in progress */
-    // TODO: Remove jump condition?
-    if (direction == WormPointing::NOT_INIT
-        || !compareDouble(jumpInitialPosition.x, (position.getPosition()->x)))
-    {
-        return false;
-    }
-
-    if (direction == WormPointing::LEFT) 
-    {
-        position.displace(-1, 0);
-        this->pointingDirection = WormPointing::LEFT;
-    }
-    else if (direction == WormPointing::RIGHT) 
-    {
-        position.displace(1, 0);
-        this->pointingDirection = WormPointing::RIGHT;
-    }
-    this->jumpInitialPosition = *(position.getPosition());
-
-    return true;
+	return this->frame;
 }
 
-bool Worm::jump(void) 
+bool Worm::getTouchingFloor(void)
 {
-    this->jumpTime++;
-
-    if (this->pointingDirection == WormPointing::LEFT)
-    {
-        this->position.setPosition(this->jumpInitialPosition.x - JUMP_X_COORD,
-            this->jumpInitialPosition.y + JUMP_Y_COORD);
-    }
-    else
-    {
-        this->position.setPosition(this->jumpInitialPosition.x + JUMP_X_COORD,
-            this->jumpInitialPosition.y + JUMP_Y_COORD);
-    }
-        
-    /* Jump's over */
-    if (compareDouble(this->jumpInitialPosition.x, 
-        this->jumpDistance + position.getPosition()->x))
-    {
-        this->jumpInitialPosition = *(this->position.getPosition());
-        this->jumpTime = 0;
-    }
-
-    return true;
+	return this->isTouchingFloor;
 }
 
+void Worm::update() 
+{
+
+	switch (this->state)
+	{
+	case WARM_MOVE:
+		
+		if (this->frameCounter == CONFIRMATION_FRAMES + 1)
+		{
+			this->frame = WF3;
+		}
+		else if (this->frameCounter <= CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES - 1 && frameCounter > CONFIRMATION_FRAMES + 1)
+		{
+			this->frame--;
+		}
+		else if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES)
+		{
+			this->frame--;
+			this->state = MOVING;
+			this->spd.x = LATERAL_MOVE_SPEED / (double)(FPS - (CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES));
+			this->spd.x *= (this->pointingDirection == LEFT) ? -1 : 1;
+		}
+		this->frameCounter++;
+		break;
+	case MOVING:
+		if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES + 1)
+		{
+			this->frame = WF1;
+		}
+		else if (this->frameCounter <= FPS)
+		{
+			this->frame++;
+		}
+		else
+		{
+			this->state = IDLE;
+			this->spd.x = 0;
+		}
+
+		if (this->frame > WF14)
+		{
+			this->frame = WF1;
+		}
+		break;
+
+	case WARM_JUMP:
+		
+		if (this->frameCounter == CONFIRMATION_FRAMES + 1)
+		{
+			this->frame = JF1;
+		}
+		else if (this->frameCounter <= CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES - 1 && frameCounter > CONFIRMATION_FRAMES + 1)
+		{
+			this->frame++;
+		}
+		else if (this->frameCounter == CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES)
+		{
+			this->frame++;
+			this->state = JUMPING;
+			this->spd.y = JUMP_INIT_SPEED * SIN60;
+			this->spd.x =JUMP_INIT_SPEED * COS60 * ((this->pointingDirection == LEFT) ? -1 : 1);
+		}
+		this->frameCounter++;
+		break;
+
+	case JUMPING:
+
+		if (this->frameCounter == CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES + 1)
+		{
+			this->frame = JF5;
+		}
+		else if (this->frame == JF10)
+		{
+			this->frame = JF1;
+			this->state = IDLE;
+		}
+		else if (this->isTouchingFloor)
+		{
+			this->frame++;
+		}
+		break;
+	default:
+		break;
+	}
+}

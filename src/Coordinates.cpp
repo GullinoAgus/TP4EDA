@@ -112,6 +112,9 @@ bool Coordinates::setPosition(coord_t x, coord_t y)
     {
         this->position.y = y;
     }
+
+
+    return true;
 }
 
 /******************** PRIVATE METHODS ********************/
