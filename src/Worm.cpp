@@ -45,6 +45,10 @@ Worm::~Worm()
 {
     displacementDirection = WormStatesType::IDLE;
     pointingDirection = WormPointing::NOT_INIT;
+    worldGravity = 0;
+    jumpDistance = 0;
+    jumpInitialPosition = { 0 };
+    jumpTime = 0;
 }
 
 bool Worm::setMaximumPosition(Point_t pos)
@@ -106,6 +110,7 @@ void Worm::getPointingDirection(WormPointing& direction)
 bool Worm::move(WormPointing direction) 
 {
     /* Either not initialized or a jump is in progress */
+    // TODO: Remove jump condition?
     if (direction == WormPointing::NOT_INIT
         || !compareDouble(jumpInitialPosition.x, (position.getPosition()->x)))
     {
