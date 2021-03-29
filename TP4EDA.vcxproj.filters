@@ -48,6 +48,12 @@
     <ClInclude Include="src\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Worm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Coordinates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Scenario.png">
@@ -157,6 +163,12 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="src\World.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Worm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Coordinates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
