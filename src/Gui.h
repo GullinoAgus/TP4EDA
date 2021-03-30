@@ -9,18 +9,30 @@ class Gui
 {
 public:
 	Gui();
+	~Gui();
+
 	bool show();
 
 private:
+	bool closeWindow;
 
 	ALLEGRO_DISPLAY* display;
 	ALLEGRO_EVENT_QUEUE* evQueue;
 	ALLEGRO_EVENT ev;
-	ALLEGRO_TIMER* fpsTimer;
 	Bitmap worldText;
 	Bitmap wormTextArr[N_FRAMES];
-	bool closeWindow;
+
+	struct
+	{
+		ALLEGRO_TIMER* fps;
+	} timer;
+
+	struct ImGuiIO* io;
+
 	World world;
+
+	bool initAllegro();
+	bool initImGui(void);
 
 	bool drawWorld();
 	bool drawWorms();

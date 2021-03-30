@@ -28,6 +28,7 @@ bool compareDouble(double a, double b)
 
 Worm::Worm(void) : position() 
 {
+	this->isTouchingFloor = false;
     this->pointingDirection = NOT_INIT;
 	this->frame = INVALID;
 	this->state = IDLE;

@@ -3,7 +3,7 @@
 
 #include "Coordinates.h"
 
-#define BITMAPHEIGHT 10 //TODO: Ver el alto del bitmap
+#define BITMAPHEIGHT 31 //TODO: Ver el alto del bitmap
 
 typedef struct {
     double x;
