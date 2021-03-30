@@ -37,6 +37,9 @@ private:
 	bool drawWorld();
 	bool drawWorms();
 
+#ifdef DEBUG
+	bool drawPlayableBox(void);
+#endif
 };
 
 #endif // !_Gui_h_

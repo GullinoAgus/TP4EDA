@@ -1,9 +1,10 @@
-#ifndef WORM_H
-#define WORM_H  1
+#ifndef _WORM_H_
+#define _WORM_H_  1
 
 #include "Coordinates.h"
 
-#define BITMAPHEIGHT 31 //TODO: Ver el alto del bitmap
+#define WORM_HEIGHT 31          
+#define WORM_WIDTH  WORM_HEIGHT
 
 typedef struct {
     double x;
@@ -90,4 +91,4 @@ private:
     speed_t spd;
 };
 
-#endif /* ! WORM_H */
+#endif /* ! _WORM_H_ */

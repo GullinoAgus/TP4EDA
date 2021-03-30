@@ -15,15 +15,26 @@
 #define DISPLAY_WIDTH	1120		//TODO: Adjust to background. 
 #define DISPLAY_HEIGHT	696			//		Set like this to fit my screen :) 
 
+#define BACKGROUND_DISPLACEMENT_X	410.0	// See todo in previous line.
+#define BACKGROUND_DISPLACEMENT_Y	0.0
+
+#define PLAYABLE_AREA_X1	(702.0-BACKGROUND_DISPLACEMENT_X)
+#define PLAYABLE_AREA_Y1	(395.0-BACKGROUND_DISPLACEMENT_Y)
+#define PLAYABLE_AREA_X2	(1212.0-BACKGROUND_DISPLACEMENT_X)
+#define PLAYABLE_AREA_Y2	(616.0-BACKGROUND_DISPLACEMENT_Y)
+
 #define FPS				50
 
 using namespace std;
 
-Gui::Gui()
+Gui::Gui() 
+	: world({PLAYABLE_AREA_X2-PLAYABLE_AREA_X1, PLAYABLE_AREA_Y2-PLAYABLE_AREA_Y1})
 {
-	Worm* p2worm = world.getWormArr();
+
 	string dirWalkingTexts = "Resources\\wwalking\\wwalk-F";
 	string dirJumpingTexts = "Resources\\wjump\\wjump-F";
+	
+	Worm* p2worm = world.getWormArr();
 
 	if (!this->initAllegro())
 		return;
@@ -196,6 +207,10 @@ bool Gui::show(void)
 					if (ev.timer.source == this->timer.fps)
 					{
 						this->drawWorld();
+#ifdef DEBUG
+						this->drawPlayableBox();
+#endif
+						this->drawWorms();
 						al_flip_display();
 					}
 					break;
@@ -214,9 +229,58 @@ bool Gui::drawWorld(void)
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	// Bitmap is drawn this way so the display can fit in my monitor :)
 	al_draw_bitmap_region(this->worldText.bitmap, 
-		410, 0, 
+		BACKGROUND_DISPLACEMENT_X, BACKGROUND_DISPLACEMENT_Y, 
 		DISPLAY_WIDTH, DISPLAY_HEIGHT,
 		0, 0, 0);
-	/*al_draw_bitmap(this->worldText.bitmap, 100, 100, 0);*/
+	/*al_draw_bitmap(this->worldText.bitmap, 0, 0, 0);*/
 	return true;
 }
+
+bool Gui::drawWorms(void)
+{
+	Point_t position = { 0 };
+	Worm * wrmarr = world.getWormArr();
+
+	for (int i = 0; i < MAX_WORMS; i++)
+	{
+		wrmarr[i].getCurrentPosition(position.x, position.y);
+		WormPointing pointing = wrmarr[i].getPointingDirection();
+		
+		Point_t pointVertex = { 0 };
+
+		position.x += PLAYABLE_AREA_X1;	// Set X = 0 relative to playable area
+		position.y += PLAYABLE_AREA_Y2 - WORM_HEIGHT;	// Set Y = 0 relative to playable area
+		pointVertex.x = position.x;
+		pointVertex.y = position.y + (WORM_HEIGHT / 2);
+
+		if (pointing == LEFT)
+		{
+			pointVertex.x -= WORM_WIDTH;
+		}
+		else if (pointing == RIGHT)
+		{
+			pointVertex.x += WORM_WIDTH;
+		}
+		al_draw_triangle(position.x, position.y, 
+						position.x, position.y + WORM_HEIGHT,
+						pointVertex.x, pointVertex.y,
+						al_map_rgb(255,0,0), 2.0);
+	}
+
+	return true;
+}
+
+#ifdef DEBUG
+bool Gui::drawPlayableBox(void)
+{
+	al_draw_rectangle(PLAYABLE_AREA_X1, PLAYABLE_AREA_Y1,
+		PLAYABLE_AREA_X2, PLAYABLE_AREA_Y2,
+		al_map_rgb(0, 0, 255), 2.0);
+
+	al_draw_rectangle(PLAYABLE_AREA_X1, PLAYABLE_AREA_Y2,
+		PLAYABLE_AREA_X2, PLAYABLE_AREA_Y2 + WORM_HEIGHT,
+		al_map_rgb(0, 255, 0), 2.0);
+
+	return true;
+}
+#endif
