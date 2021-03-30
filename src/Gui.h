@@ -24,7 +24,7 @@ private:
 
 	bool drawWorld();
 	bool drawWorms();
-	bool loadBitmaps();
+
 };
 
 #endif // !_Gui_h_

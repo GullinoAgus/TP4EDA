@@ -89,10 +89,10 @@
     <ClInclude Include="lib\ImGui\imstb_rectpack.h" />
     <ClInclude Include="lib\ImGui\imstb_textedit.h" />
     <ClInclude Include="lib\ImGui\imstb_truetype.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="src\Bitmap.h" />
     <ClInclude Include="src\Coordinates.h" />
     <ClInclude Include="src\Gui.h" />
+    <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\Worm.h" />
   </ItemGroup>

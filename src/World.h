@@ -12,9 +12,10 @@ class World
 {
 public:
 
-	
+	void update(void);
 
-	void update();
+	Worm* getWormArr(void);
+
 
 private:
 	Worm wormArr[MAX_WORMS];

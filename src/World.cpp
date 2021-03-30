@@ -25,3 +25,8 @@ void World::update() {
 	
 }
 
+Worm* World::getWormArr(void)
+{
+	return this->wormArr;
+}
+

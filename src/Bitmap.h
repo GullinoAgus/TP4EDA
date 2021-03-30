@@ -1,7 +1,5 @@
 #pragma once
 
-#include "allegro.h"
-
 class Bitmap
 {
 public:
