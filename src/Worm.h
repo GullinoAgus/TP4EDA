@@ -3,6 +3,8 @@
 
 #include "Coordinates.h"
 
+#define BITMAPHEIGHT 10 //TODO: Ver el alto del bitmap
+
 typedef struct {
     double x;
     double y;
@@ -60,16 +62,18 @@ public:
     void update(void);
 
     bool setMaximumPosition(Point_t pos); /* Set before intial position */
-    bool setInitialPosition(Point_t pos);
+    bool setPosition(Point_t pos);
     bool setInitialPointingDirection(WormPointing dir);
     void setTouchingFloor(bool value);
+    bool setSpeed(speed_t newSpd);
 
     const Point_t* getCurrentPosition(void);
     void getCurrentPosition(coord_t& x, coord_t& y);
     WormPointing getPointingDirection(void);
     void getPointingDirection(WormPointing& direction);
-    int getFrame();
-    bool getTouchingFloor();
+    int getFrame(void);
+    bool getTouchingFloor(void);
+    speed_t getSpeed(void);
 
 private:
     Coordinates position;

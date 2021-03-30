@@ -4,7 +4,7 @@
 
 #include "Worm.h"
 
-#define BITMAPHEIGHT 10 //TODO: Ver el alto del bitmap
+
 
 #define JUMP_INIT_SPEED (4.5)
 
@@ -61,7 +61,7 @@ bool Worm::setMaximumPosition(Point_t pos)
     return position.setMaximumCoordinates(pos.x, pos.y);
 }
 
-bool Worm::setInitialPosition(Point_t pos)
+bool Worm::setPosition(Point_t pos)
 {
     return position.setPosition(pos.x, pos.y);
 }
@@ -84,6 +84,11 @@ bool Worm::setInitialPointingDirection(WormPointing dir)
 void Worm::setTouchingFloor(bool value)
 {
 	this->isTouchingFloor = value;
+}
+
+bool Worm::setSpeed(speed_t newSpd)
+{
+	this->spd = newSpd;
 }
 
 const Point_t* Worm::getCurrentPosition(void)
@@ -115,6 +120,11 @@ int Worm::getFrame(void)
 bool Worm::getTouchingFloor(void)
 {
 	return this->isTouchingFloor;
+}
+
+speed_t Worm::getSpeed(void)
+{
+	return this->spd;
 }
 
 void Worm::update() 
@@ -176,6 +186,7 @@ void Worm::update()
 		{
 			this->frame++;
 			this->state = JUMPING;
+			this->isTouchingFloor = false;
 			this->spd.y = JUMP_INIT_SPEED * SIN60;
 			this->spd.x =JUMP_INIT_SPEED * COS60 * ((this->pointingDirection == LEFT) ? -1 : 1);
 		}
@@ -196,6 +207,7 @@ void Worm::update()
 		else if (this->isTouchingFloor)
 		{
 			this->frame++;
+			this->spd = { 0 };
 		}
 		break;
 	default:
