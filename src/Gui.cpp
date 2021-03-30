@@ -7,7 +7,7 @@ using namespace std;
 
 Gui::Gui()
 {
-	Worm* p2worm = 
+	Worm* p2worm = world.getWormArr();
 	string dirWalkingTexts = ".//Resources//wwalking//wwalk-F";
 	string dirJumpingTexts = ".//Resources//wjump//wjump-F";
 
@@ -26,6 +26,7 @@ Gui::Gui()
 		}
 	}
 	this->worldText = Bitmap(".//Resources//Scenario.png");
+	
 	
 
 }
