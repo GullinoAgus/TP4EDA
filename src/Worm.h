@@ -10,13 +10,13 @@ typedef struct {
     double y;
 }speed_t;
 
-typedef enum WormPointing {
+enum WormPointing {
     NOT_INIT = 0,
     LEFT,
     RIGHT
 } ;
 
-typedef enum WormStatesType {
+enum WormStatesType {
     IDLE = 0,
     WARM_MOVE,
     MOVING,

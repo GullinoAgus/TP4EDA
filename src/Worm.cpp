@@ -89,6 +89,7 @@ void Worm::setTouchingFloor(bool value)
 bool Worm::setSpeed(speed_t newSpd)
 {
 	this->spd = newSpd;
+	return true;
 }
 
 const Point_t* Worm::getCurrentPosition(void)
