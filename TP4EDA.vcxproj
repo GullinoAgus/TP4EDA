@@ -90,7 +90,9 @@
     <ClInclude Include="lib\ImGui\imstb_textedit.h" />
     <ClInclude Include="lib\ImGui\imstb_truetype.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\Bitmap.h" />
     <ClInclude Include="src\Coordinates.h" />
+    <ClInclude Include="src\Gui.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\Worm.h" />
   </ItemGroup>
@@ -132,8 +134,10 @@
     <ClCompile Include="lib\ImGui\imgui_impl_allegro5.cpp" />
     <ClCompile Include="lib\ImGui\imgui_tables.cpp" />
     <ClCompile Include="lib\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Bitmap.cpp" />
     <ClCompile Include="src\Coordinates.cpp" />
+    <ClCompile Include="src\Gui.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TP4EDA.cpp" />
     <ClCompile Include="src\World.cpp" />
     <ClCompile Include="src\Worm.cpp" />

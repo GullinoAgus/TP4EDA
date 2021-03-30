@@ -8,7 +8,7 @@
 #include <ImGui\imgui.h>
 #include <ImGui\imgui_impl_allegro5.h>
 //
-int main(int, char**)
+int _main(int, char**)
 {
     // Setup Allegro
     al_init();
