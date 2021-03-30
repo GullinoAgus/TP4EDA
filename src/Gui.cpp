@@ -417,8 +417,9 @@ bool Gui::drawWorms(void)
 
 		position.x += PLAYABLE_AREA_X1;	// Set X = 0 relative to playable area
 		position.y += PLAYABLE_AREA_Y2;	// Set Y = 0 relative to playable area
+
 		pointVertex.x = position.x;
-		pointVertex.y = position.y - (WORM_HEIGHT / 2);
+		pointVertex.y = position.y + (WORM_HEIGHT / 2);
 
 		if (pointing == LEFT)
 		{
@@ -429,9 +430,11 @@ bool Gui::drawWorms(void)
 			pointVertex.x += WORM_WIDTH;
 		}
 		al_draw_triangle(position.x, position.y, 
-						position.x, position.y - WORM_HEIGHT,
+						position.x, position.y + WORM_HEIGHT,
 						pointVertex.x, pointVertex.y,
 						al_map_rgb(255,0,0), 2.0);
+		int flag = wrmarr[i].getPointingDirection() == LEFT ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+		al_draw_bitmap(this->wormTextArr[0].bitmap, position.x, position.y, flag);
 	}
 
 	return true;
@@ -445,7 +448,7 @@ bool Gui::drawPlayableBox(void)
 		al_map_rgb(0, 0, 255), 2.0);
 
 	al_draw_rectangle(PLAYABLE_AREA_X1, PLAYABLE_AREA_Y2,
-		PLAYABLE_AREA_X2, PLAYABLE_AREA_Y2 - WORM_HEIGHT,
+		PLAYABLE_AREA_X2, PLAYABLE_AREA_Y2 + WORM_HEIGHT,
 		al_map_rgb(0, 255, 0), 2.0);
 
 	return true;
