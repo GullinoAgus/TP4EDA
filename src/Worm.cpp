@@ -45,7 +45,7 @@ Worm::Worm(Point_t initPosition, Point_t maxPosition,
 	this->frameCounter = 0;
 	this->spd = { 0 };
 
-	this->setInitialPointingDirection(direction);
+	this->setPointingDirection(direction);
 	this->frame = WF1;
 }
 
@@ -67,7 +67,7 @@ bool Worm::setPosition(Point_t pos)
     return position.setPosition(pos.x, pos.y);
 }
 
-bool Worm::setInitialPointingDirection(WormPointing dir)
+bool Worm::setPointingDirection(WormPointing dir)
 {
 	if (dir == LEFT || dir == RIGHT) 
 	{
@@ -75,7 +75,6 @@ bool Worm::setInitialPointingDirection(WormPointing dir)
 	}
 	else
 	{
-		std::cout << "Invalid direction!" << std::endl;
 		return false;
 	}
 
@@ -129,90 +128,118 @@ speed_t Worm::getSpeed(void)
 	return this->spd;
 }
 
+WormStatesType Worm::getState(void)
+{
+	return this->state;
+}
+
+bool Worm::setState(WormStatesType newState)
+{
+	//std::cout << "New state: " << newState << std::endl;
+	if (newState == IDLE 
+		|| newState == WARM_JUMP || newState == WARM_MOVE)
+	{
+		this->state = newState;
+		if (newState == IDLE)
+		{
+			this->frameCounter = 0;
+			this->frame = WF1;
+			this->spd.x = 0;
+			this->spd.y = 0;
+		}
+		return true;
+	}
+
+	return false;
+}
+
 void Worm::update() 
 {
+#ifdef DEBUG
+	//std::cout << "Worms update called!" << std::endl;
+#endif
 
 	switch (this->state)
 	{
-	case WARM_MOVE:
-		
-		if (this->frameCounter == CONFIRMATION_FRAMES + 1)
-		{
-			this->frame = WF3;
-		}
-		else if (this->frameCounter <= CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES - 1 && frameCounter > CONFIRMATION_FRAMES + 1)
-		{
-			this->frame--;
-		}
-		else if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES)
-		{
-			this->frame--;
-			this->state = MOVING;
-			this->spd.x = LATERAL_MOVE_SPEED / (double)(FPS - (CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES));
-			this->spd.x *= (this->pointingDirection == LEFT) ? -1 : 1;
-		}
-		this->frameCounter++;
-		break;
-	case MOVING:
-		if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES + 1)
-		{
-			this->frame = WF1;
-		}
-		else if (this->frameCounter <= FPS)
-		{
-			this->frame++;
-		}
-		else
-		{
-			this->state = IDLE;
-			this->spd.x = 0;
-		}
+		case WARM_MOVE:
+			if (this->frameCounter == CONFIRMATION_FRAMES + 1)
+			{
+				this->frame = WF3;
+			}
+			else if (this->frameCounter <= CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES - 1 && frameCounter > CONFIRMATION_FRAMES + 1)
+			{
+				this->frame--;
+			}
+			else if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES)
+			{
+				this->frame--;
+				this->state = MOVING;
+				this->spd.x = LATERAL_MOVE_SPEED / (double)(FPS - (CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES));
+				this->spd.x *= (this->pointingDirection == LEFT) ? -1 : 1;
+			}
+			this->frameCounter++;
+			break;
 
-		if (this->frame > WF14)
-		{
-			this->frame = WF1;
-		}
-		break;
+		case MOVING:
+			if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES + 1)
+			{
+				this->frame = WF1;
+			}
+			else if (this->frameCounter <= FPS)
+			{
+				this->frame++;
+			}
+			else
+			{
+				this->state = IDLE;
+				this->spd.x = 0;
+			}
 
-	case WARM_JUMP:
-		
-		if (this->frameCounter == CONFIRMATION_FRAMES + 1)
-		{
-			this->frame = JF1;
-		}
-		else if (this->frameCounter <= CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES - 1 && frameCounter > CONFIRMATION_FRAMES + 1)
-		{
-			this->frame++;
-		}
-		else if (this->frameCounter == CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES)
-		{
-			this->frame++;
-			this->state = JUMPING;
-			this->isTouchingFloor = false;
-			this->spd.y = JUMP_INIT_SPEED * SIN60;
-			this->spd.x =JUMP_INIT_SPEED * COS60 * ((this->pointingDirection == LEFT) ? -1 : 1);
-		}
-		this->frameCounter++;
-		break;
+			if (this->frame > WF14)
+			{
+				this->frame = WF1;
+			}
+			this->frameCounter++;
+			break;
 
-	case JUMPING:
+		case WARM_JUMP:
+			if (this->frameCounter == CONFIRMATION_FRAMES + 1)
+			{
+				this->frame = JF1;
+			}
+			else if (this->frameCounter <= CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES - 1 && frameCounter > CONFIRMATION_FRAMES + 1)
+			{
+				this->frame++;
+			}
+			else if (this->frameCounter == CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES)
+			{
+				this->frame++;
+				this->state = JUMPING;
+				this->isTouchingFloor = false;
+				this->spd.y = -JUMP_INIT_SPEED * SIN60;
+				this->spd.x =JUMP_INIT_SPEED * COS60 * ((this->pointingDirection == LEFT) ? -1 : 1);
+			}
+			this->frameCounter++;
+			break;
 
-		if (this->frameCounter == CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES + 1)
-		{
-			this->frame = JF5;
+		case JUMPING:
+			if (this->frameCounter == CONFIRMATION_FRAMES + JUMP_WARM_UP_FRAMES + 1)
+			{
+				this->frame = JF5;
+			}
+			else if (this->frame == JF10)
+			{
+				this->frame = JF1;
+				this->state = IDLE;
+			}
+			else if (this->isTouchingFloor)
+			{
+				this->frame++;
+				this->spd = { 0 };
+			}
+			this->frameCounter++;
+			break;
+		default:
+			break;
 		}
-		else if (this->frame == JF10)
-		{
-			this->frame = JF1;
-			this->state = IDLE;
-		}
-		else if (this->isTouchingFloor)
-		{
-			this->frame++;
-			this->spd = { 0 };
-		}
-		break;
-	default:
-		break;
-	}
 }

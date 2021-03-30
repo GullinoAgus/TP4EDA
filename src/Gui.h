@@ -18,7 +18,6 @@ private:
 
 	ALLEGRO_DISPLAY* display;
 	ALLEGRO_EVENT_QUEUE* evQueue;
-	ALLEGRO_EVENT ev;
 	Bitmap worldText;
 	Bitmap wormTextArr[N_FRAMES];
 
@@ -27,12 +26,21 @@ private:
 		ALLEGRO_TIMER* fps;
 	} timer;
 
-	struct ImGuiIO* io;
+	bool keysDown[ALLEGRO_KEY_MAX];
+	double keysDownTime[ALLEGRO_KEY_MAX];
 
 	World world;
 
 	bool initAllegro();
 	bool initImGui(void);
+	void eventDispatcher(ALLEGRO_EVENT& ev);
+
+	bool startMoving(int key);
+	bool startJumping(int key);
+	bool stopMoving(int key);
+
+	bool isValidWormKey(WormsByName worm, int key);
+	bool wormEvent(void);
 
 	bool drawWorld();
 	bool drawWorms();

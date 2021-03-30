@@ -7,19 +7,30 @@ World::World(Point_t worldSize)
 	worldSize.x = fabs(worldSize.x);
 	worldSize.y = fabs(worldSize.y);
 
-	initPos.x = 10;
-	initPos.y = HORIZONTAL;
+	initPos.x = 10 + WORM_WIDTH;
+	initPos.y = 0;
 	wormArr[0] = Worm(initPos, worldSize, RIGHT);
 	
 	initPos.x = worldSize.x - 10 - WORM_WIDTH;
-	initPos.y = HORIZONTAL;
+	initPos.y = 0;
 	wormArr[1] = Worm(initPos, worldSize, LEFT);
 
 	return;
 }
 
-void World::update() {
-	
+void World::update()
+{
+#ifdef  DEBUG
+	std::cout 
+		<< "Isaac: "
+		<< "\n\tState: " << getWorm(WormsByName::Isaac)->getState()
+		<< "\n\tFrame: " << getWorm(WormsByName::Isaac)->getFrame()
+		<< "\nRay: "
+		<< "\n\tState: " << getWorm(WormsByName::Ray)->getState()
+		<< "\n\tFrame: " << getWorm(WormsByName::Ray)->getFrame()
+		<< std::endl;
+#endif //  DEBUG
+
 	Point_t auxPoint;
 	speed_t auxSpeed;
 	for (int i = 0; i < MAX_WORMS; i++)
@@ -29,15 +40,21 @@ void World::update() {
 
 		auxPoint.x += auxSpeed.x;
 		auxPoint.y += auxSpeed.y;
-		if (auxPoint.y - WORM_HEIGHT < HORIZONTAL)
+		//if (auxPoint.y - WORM_HEIGHT < HORIZONTAL)
+		if (auxPoint.y < 0.0)
 		{
 			wormArr[i].setTouchingFloor(true);
-			auxPoint.y = (coord_t) HORIZONTAL + WORM_HEIGHT;
+			//auxPoint.y = (coord_t) HORIZONTAL + WORM_HEIGHT;
+			auxPoint.y = (coord_t) 0.0;
 		}
-		auxSpeed.y -= GRAVITY;
+		if (!this->wormArr[i].getTouchingFloor())
+		{
+			auxSpeed.y += GRAVITY;
+		}
 
 		this->wormArr[i].setPosition(auxPoint);
 		this->wormArr[i].setSpeed(auxSpeed);
+		this->wormArr[i].update();
 	}
 	
 }
@@ -47,3 +64,57 @@ Worm* World::getWormArr(void)
 	return this->wormArr;
 }
 
+void World::warmUpWorm(WormsByName name, WormActions action, WormPointing direction)
+{
+	std::cout << "Warm up.." << std::endl;
+	Worm* worm = getWorm(name);
+	if (worm == NULL) return;
+
+	WormStatesType state = IDLE;
+	if (action == WormActions::JUMP)
+	{
+		state = WARM_JUMP;
+	}
+	else if (action == WormActions::WALK)
+	{
+		state = WARM_MOVE;
+	}
+
+	if (worm->getState() == IDLE)
+	{
+		if (state != WARM_JUMP)
+		{
+			worm->setPointingDirection(direction);
+		}
+		worm->setState(state);
+	}
+
+	worm->update();
+
+	return;
+}
+
+bool World::forceWormStop(WormsByName name)
+{
+	Worm* worm = getWorm(name);
+	if (worm == NULL) return false;
+	worm->setState(IDLE);
+
+	return true;
+}
+
+Worm* World::getWorm(WormsByName name)
+{
+	if (name == WormsByName::Isaac)
+	{
+		return &this->wormArr[0];
+	}
+	else if (name == WormsByName::Ray)
+	{
+		return &this->wormArr[1];
+	}
+	else
+	{
+		return NULL;
+	}
+}

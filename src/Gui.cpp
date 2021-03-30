@@ -20,7 +20,7 @@
 
 #define PLAYABLE_AREA_X1	(702.0-BACKGROUND_DISPLACEMENT_X)
 #define PLAYABLE_AREA_Y1	(395.0-BACKGROUND_DISPLACEMENT_Y)
-#define PLAYABLE_AREA_X2	(1212.0-BACKGROUND_DISPLACEMENT_X)
+#define PLAYABLE_AREA_X2	(1211.0-BACKGROUND_DISPLACEMENT_X)
 #define PLAYABLE_AREA_Y2	(616.0-BACKGROUND_DISPLACEMENT_Y)
 
 #define FPS				50
@@ -129,6 +129,12 @@ bool Gui::initAllegro(void)
 	al_register_event_source(this->evQueue, al_get_keyboard_event_source());
 	al_register_event_source(this->evQueue, al_get_mouse_event_source());
 
+	for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
+	{
+		this->keysDown[i] = false;
+		this->keysDownTime[i] = 0;
+	}
+
 	return true;
 }
 
@@ -137,8 +143,6 @@ bool Gui::initImGui(void)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
     ImGui::StyleColorsDark();
-
-	this->io = &(ImGui::GetIO()); (void)io;
 
 	ImGui_ImplAllegro5_Init(this->display);
 
@@ -186,42 +190,205 @@ bool Gui::show(void)
 	// Start timers
 	al_start_timer(this->timer.fps);
 
+	ALLEGRO_EVENT ev;
 	while (!this->closeWindow)
 	{
-		while (al_get_next_event(this->evQueue, &this->ev))
+		while (al_get_next_event(this->evQueue, &ev))
 		{
-			ImGui_ImplAllegro5_ProcessEvent(&ev);
-			switch (ev.type)
-			{
-				case ALLEGRO_EVENT_DISPLAY_CLOSE:
-					closeWindow = true;
-				break;
-
-				/*case ALLEGRO_EVENT_DISPLAY_RESIZE:
-					ImGui_ImplAllegro5_InvalidateDeviceObjects();
-					al_acknowledge_resize(display);
-					ImGui_ImplAllegro5_CreateDeviceObjects();
-					break;
-				*/
-				case ALLEGRO_EVENT_TIMER:
-					if (ev.timer.source == this->timer.fps)
-					{
-						this->drawWorld();
-#ifdef DEBUG
-						this->drawPlayableBox();
-#endif
-						this->drawWorms();
-						al_flip_display();
-					}
-					break;
-
-				default:
-					break;
-			}
+			eventDispatcher(ev);
 		}
 	}
 
 	return true;
+}
+
+void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
+{
+	//ImGui_ImplAllegro5_ProcessEvent(&ev);
+	switch (ev.type)
+	{
+		case ALLEGRO_EVENT_DISPLAY_CLOSE:
+			closeWindow = true;
+			break;
+
+		case ALLEGRO_EVENT_KEY_DOWN:
+			// Pressing ALT generates a lot of unnecessary trash in allegro.
+			// Let's ignore it.
+			if (ev.keyboard.keycode != ALLEGRO_KEY_ALT)
+			{
+				this->keysDown[ev.keyboard.keycode] = true;
+			}
+			
+			break;
+
+		case ALLEGRO_EVENT_KEY_UP:
+			this->keysDown[ev.keyboard.keycode] = false;
+
+			// Only stops movement when key was not pressed long enough
+			if (islessequal(this->keysDownTime[ev.keyboard.keycode], WORM_IDLE_TIME)) 
+			{
+				this->keysDownTime[ev.keyboard.keycode] = 0;
+				this->stopMoving(ev.keyboard.keycode);
+			}
+			break;
+
+		case ALLEGRO_EVENT_TIMER:
+			if (ev.timer.source == this->timer.fps)
+			{
+				// Increase key-pressed timer
+				for (int key = 0; key < ALLEGRO_KEY_MAX; key++)
+				{
+					// New key-press event
+					if (this->keysDown[key] && islessequal(this->keysDownTime[key], 0.0))
+					{
+						if (!startMoving(key)) startJumping(key);
+
+						this->keysDownTime[key] += al_get_timer_speed(this->timer.fps);
+					}
+					// Key pressed for too long, clear it (will be reset in next tick)
+					else if (isgreaterequal(this->keysDownTime[key], 1.0))
+					{
+						this->keysDownTime[key] = 0.0;
+						this->stopMoving(key);
+					}
+					// Key pressed or movement in progress
+					else if (this->keysDown[key] || isgreater(this->keysDownTime[key], 0.0))
+					{
+						this->keysDownTime[key] += al_get_timer_speed(this->timer.fps);
+					}
+				}
+				this->wormEvent();
+
+
+				this->drawWorld();
+#ifdef DEBUG
+				this->drawPlayableBox();
+#endif
+				this->drawWorms();
+				al_flip_display();
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+
+bool Gui::startMoving(int key)
+{
+	bool validKey = true;
+
+	switch (key)
+	{
+		case ALLEGRO_KEY_A:
+			world.warmUpWorm(WormsByName::Isaac, WormActions::WALK, LEFT);
+			break;
+
+		case ALLEGRO_KEY_D:
+			world.warmUpWorm(WormsByName::Isaac, WormActions::WALK, RIGHT);
+			break;
+
+		case ALLEGRO_KEY_LEFT:
+			world.warmUpWorm(WormsByName::Ray, WormActions::WALK, LEFT);
+			break;
+
+		case ALLEGRO_KEY_RIGHT:
+			world.warmUpWorm(WormsByName::Ray, WormActions::WALK, RIGHT);
+			break;
+
+		default:
+			validKey = false;
+			break;
+	}
+
+	return validKey;
+}
+
+bool Gui::startJumping(int key)
+{
+	bool validKey = true;
+
+	switch (key)
+	{
+		case ALLEGRO_KEY_W:
+			world.warmUpWorm(WormsByName::Isaac, WormActions::JUMP, NOT_INIT);
+			break;
+
+		case ALLEGRO_KEY_UP:
+			world.warmUpWorm(WormsByName::Ray, WormActions::JUMP, NOT_INIT);
+			break;
+
+		default:
+			validKey = false;
+			break;
+	}
+
+	return validKey;
+}
+
+bool Gui::stopMoving(int key)
+{
+	if (key == ALLEGRO_KEY_A || key == ALLEGRO_KEY_D)
+	{
+		world.forceWormStop(WormsByName::Isaac);
+	}
+
+	if (key == ALLEGRO_KEY_LEFT || key == ALLEGRO_KEY_RIGHT)
+	{
+		world.forceWormStop(WormsByName::Ray);
+	}
+	return true;
+}
+
+bool Gui::wormEvent()
+{
+	Worm* worms = this->world.getWormArr();
+
+	for (int key = 0; key < ALLEGRO_KEY_MAX; key++)
+	{
+		if (islessequal(keysDownTime[key], 0.0)) continue;
+
+
+		if (isValidWormKey(WormsByName::Isaac, key)
+			|| isValidWormKey(WormsByName::Ray, key))
+		{
+			cout << "key: " << key << " time: " << keysDownTime[key] << endl;
+			world.update();
+		}
+	}
+
+	return true;
+}
+
+bool Gui::isValidWormKey(WormsByName worm, int key)
+{
+	bool valid = false;
+	if (worm == WormsByName::Isaac)
+	{
+		switch (key)
+		{
+			case ALLEGRO_KEY_A:
+			case ALLEGRO_KEY_W:
+			case ALLEGRO_KEY_D:
+				valid = true;
+				break;
+		}
+	}
+
+	else if (worm == WormsByName::Ray)
+	{
+		switch (key)
+		{
+			case ALLEGRO_KEY_LEFT:
+			case ALLEGRO_KEY_UP:
+			case ALLEGRO_KEY_RIGHT:
+				valid = true;
+				break;
+		}
+	}
+
+	return valid;
+
 }
 
 bool Gui::drawWorld(void)
@@ -249,9 +416,9 @@ bool Gui::drawWorms(void)
 		Point_t pointVertex = { 0 };
 
 		position.x += PLAYABLE_AREA_X1;	// Set X = 0 relative to playable area
-		position.y += PLAYABLE_AREA_Y2 - WORM_HEIGHT;	// Set Y = 0 relative to playable area
+		position.y += PLAYABLE_AREA_Y2;	// Set Y = 0 relative to playable area
 		pointVertex.x = position.x;
-		pointVertex.y = position.y + (WORM_HEIGHT / 2);
+		pointVertex.y = position.y - (WORM_HEIGHT / 2);
 
 		if (pointing == LEFT)
 		{
@@ -262,7 +429,7 @@ bool Gui::drawWorms(void)
 			pointVertex.x += WORM_WIDTH;
 		}
 		al_draw_triangle(position.x, position.y, 
-						position.x, position.y + WORM_HEIGHT,
+						position.x, position.y - WORM_HEIGHT,
 						pointVertex.x, pointVertex.y,
 						al_map_rgb(255,0,0), 2.0);
 	}
@@ -278,9 +445,10 @@ bool Gui::drawPlayableBox(void)
 		al_map_rgb(0, 0, 255), 2.0);
 
 	al_draw_rectangle(PLAYABLE_AREA_X1, PLAYABLE_AREA_Y2,
-		PLAYABLE_AREA_X2, PLAYABLE_AREA_Y2 + WORM_HEIGHT,
+		PLAYABLE_AREA_X2, PLAYABLE_AREA_Y2 - WORM_HEIGHT,
 		al_map_rgb(0, 255, 0), 2.0);
 
 	return true;
 }
 #endif
+

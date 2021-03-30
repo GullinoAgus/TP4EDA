@@ -6,9 +6,20 @@
 //#define MAX_X_POS 1212
 //#define MIN_X_POS 701
 
-#define HORIZONTAL	(WORM_HEIGHT)
 #define MAX_WORMS	2
 #define GRAVITY		0.24
+
+enum class WormsByName
+{
+	Isaac,
+	Ray
+};
+
+enum class WormActions 
+{
+	JUMP,
+	WALK
+};
 
 class World
 {
@@ -19,7 +30,11 @@ public:
 
 	Worm* getWormArr(void);
 
+	void warmUpWorm(WormsByName name, WormActions action, WormPointing direction);
+	bool forceWormStop(WormsByName name);
+
 private:
+	Worm* getWorm(WormsByName name);
 	Worm wormArr[MAX_WORMS];
 };
 

@@ -5,6 +5,7 @@
 
 #define WORM_HEIGHT 31          
 #define WORM_WIDTH  WORM_HEIGHT
+#define WORM_IDLE_TIME  (0.1)       // Time before start moving in seconds
 
 typedef struct {
     double x;
@@ -65,14 +66,18 @@ public:
 
     bool setMaximumPosition(Point_t pos); /* Set before intial position */
     bool setPosition(Point_t pos);
-    bool setInitialPointingDirection(WormPointing dir);
+    bool setPointingDirection(WormPointing dir);
     void setTouchingFloor(bool value);
     bool setSpeed(speed_t newSpd);
+
+    bool setState(WormStatesType newState); // Only let's you set WARM_* and IDLE states
 
     const Point_t* getCurrentPosition(void);
     void getCurrentPosition(coord_t& x, coord_t& y);
     WormPointing getPointingDirection(void);
     void getPointingDirection(WormPointing& direction);
+
+    WormStatesType getState(void);
     int getFrame(void);
     bool getTouchingFloor(void);
     speed_t getSpeed(void);
