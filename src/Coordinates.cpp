@@ -48,16 +48,16 @@ Coordinates::~Coordinates(void) {
 void Coordinates::displace(coord_t x, coord_t y) {
     this->position.x += x;
     this->position.y += y;
-    if (isless(x, 0.0)) {
+    if (isless(this->position.x, 0.0)) {
         this->position.x = 0;
     }
-    else if (isgreater(x, maximumCoordinates.x)) {
+    else if (isgreater(this->position.x, maximumCoordinates.x)) {
         this->position.x = this->maximumCoordinates.x;
     }
-    if (isless(y, 0.0)) {
+    if (isless(this->position.y, 0.0)) {
         this->position.y = 0;
     }
-    else if (isgreater(y, maximumCoordinates.y)) {
+    else if (isgreater(this->position.y, maximumCoordinates.y)) {
         this->position.y = this->maximumCoordinates.y;
     }
 }
@@ -87,9 +87,9 @@ bool Coordinates::setMaximumCoordinates(coord_t x, coord_t y) {
 
 bool Coordinates::setPosition(coord_t x, coord_t y)
 {
-    if (isless(x, 0.0)) 
+    if (isless(x, 0.0))
     {
-        this->position.x = 0;
+        this->position.x = 0.0;
     }
     else if (isgreater(x, this->maximumCoordinates.x))
     {
@@ -100,11 +100,8 @@ bool Coordinates::setPosition(coord_t x, coord_t y)
         this->position.x = x;
     }
 
-    if (isless(y, 0.0)) 
-    {
-        this->position.y = 0;
-    }
-    else if (isgreater(y, this->maximumCoordinates.y))
+   
+    if (isgreater(y, this->maximumCoordinates.y))
     {
         this->position.y = this->maximumCoordinates.y;
     }

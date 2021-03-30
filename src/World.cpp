@@ -1,17 +1,18 @@
 #include <iostream>
 #include "World.h"
 
+
 World::World(Point_t worldSize)
 {
 	Point_t initPos = { 0 };
 	worldSize.x = fabs(worldSize.x);
 	worldSize.y = fabs(worldSize.y);
 
-	initPos.x = 10 + WORM_WIDTH;
+	initPos.x = 10.0 + WORM_WIDTH;
 	initPos.y = 0;
 	wormArr[0] = Worm(initPos, worldSize, RIGHT);
 	
-	initPos.x = worldSize.x - 10 - WORM_WIDTH;
+	initPos.x = worldSize.x - 10.0 - WORM_WIDTH;
 	initPos.y = 0;
 	wormArr[1] = Worm(initPos, worldSize, LEFT);
 
@@ -21,27 +22,29 @@ World::World(Point_t worldSize)
 void World::update()
 {
 #ifdef  DEBUG
-	std::cout 
+	/*std::cout 
 		<< "Isaac: "
 		<< "\n\tState: " << getWorm(WormsByName::Isaac)->getState()
 		<< "\n\tFrame: " << getWorm(WormsByName::Isaac)->getFrame()
 		<< "\nRay: "
 		<< "\n\tState: " << getWorm(WormsByName::Ray)->getState()
 		<< "\n\tFrame: " << getWorm(WormsByName::Ray)->getFrame()
-		<< std::endl;
+		<< std::endl;*/
 #endif //  DEBUG
 
 	Point_t auxPoint;
 	speed_t auxSpeed;
 	for (int i = 0; i < MAX_WORMS; i++)
 	{
+		this->wormArr[i].update();
+
 		auxSpeed = this->wormArr[i].getSpeed();
 		auxPoint = *this->wormArr[i].getCurrentPosition();
 
 		auxPoint.x += auxSpeed.x;
 		auxPoint.y += auxSpeed.y;
 		//if (auxPoint.y - WORM_HEIGHT < HORIZONTAL)
-		if (auxPoint.y < 0.0)
+		if (auxPoint.y > 0.0)
 		{
 			wormArr[i].setTouchingFloor(true);
 			//auxPoint.y = (coord_t) HORIZONTAL + WORM_HEIGHT;
@@ -54,7 +57,7 @@ void World::update()
 
 		this->wormArr[i].setPosition(auxPoint);
 		this->wormArr[i].setSpeed(auxSpeed);
-		this->wormArr[i].update();
+		
 	}
 	
 }
@@ -89,7 +92,7 @@ void World::warmUpWorm(WormsByName name, WormActions action, WormPointing direct
 		worm->setState(state);
 	}
 
-	worm->update();
+	//worm->update();
 
 	return;
 }

@@ -5,7 +5,7 @@
 
 #define WORM_HEIGHT 31          
 #define WORM_WIDTH  WORM_HEIGHT
-#define WORM_IDLE_TIME  (0.1)       // Time before start moving in seconds
+
 
 typedef struct {
     double x;

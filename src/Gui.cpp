@@ -246,10 +246,10 @@ void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 						this->keysDownTime[key] += al_get_timer_speed(this->timer.fps);
 					}
 					// Key pressed for too long, clear it (will be reset in next tick)
-					else if (isgreaterequal(this->keysDownTime[key], 1.0))
+					else if (isgreater(this->keysDownTime[key], 1.0))
 					{
 						this->keysDownTime[key] = 0.0;
-						this->stopMoving(key);
+						//this->stopMoving(key);
 					}
 					// Key pressed or movement in progress
 					else if (this->keysDown[key] || isgreater(this->keysDownTime[key], 0.0))
