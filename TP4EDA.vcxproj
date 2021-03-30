@@ -132,6 +132,7 @@
     <ClCompile Include="lib\ImGui\imgui_impl_allegro5.cpp" />
     <ClCompile Include="lib\ImGui\imgui_tables.cpp" />
     <ClCompile Include="lib\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Coordinates.cpp" />
     <ClCompile Include="src\TP4EDA.cpp" />
     <ClCompile Include="src\World.cpp" />
