@@ -4,21 +4,21 @@
 #include "Coordinates.h"
 
 #define WORM_HEIGHT (60)
-#define WORM_WIDTH  (WORM_HEIGHT-20)    //Cambie esto yo
+#define WORM_WIDTH  (WORM_HEIGHT-20)    
 
 
-typedef struct {
+typedef struct { //estructura para la velocidad
     double x;
     double y;
 }speed_t;
 
-enum WormPointing {
+enum WormPointing { //me fijo en que direc apunta el worm
     NOT_INIT = 0,
     LEFT,
     RIGHT
 } ;
 
-enum WormStatesType {
+enum WormStatesType { //en que estado esta el worm
     IDLE = 0,
     WARM_MOVE,
     MOVING,
@@ -26,7 +26,7 @@ enum WormStatesType {
     JUMPING,
 };
 
-enum AnimeFrameType {
+enum AnimeFrameType { //en que frame esta asi puedo graficar facilmente
     INVALID = -1,
     WF1 = 0,
     WF2,

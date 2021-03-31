@@ -3,17 +3,17 @@
 #include "Worm.h"
 #include "config.h"
 //#define HORIZONTAL 616
-//#define MAX_X_POS 1212
+//#define MAX_X_POS 1212 //defino los desplazamientos validos para los worms
 //#define MIN_X_POS 701
 
 
-enum class WormsByName
+enum class WormsByName //nombres de los worms
 {
 	Isaac,
 	Ray
 };
 
-enum class WormActions 
+enum class WormActions //acciones de los worms
 {
 	JUMP,
 	WALK

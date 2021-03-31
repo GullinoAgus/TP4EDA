@@ -13,11 +13,11 @@
 
 #define LATERAL_MOVE_SPEED 27.0
 
-#define CONFIRMATION_FRAMES 5
+#define CONFIRMATION_FRAMES 5  //frames segun consigna
 #define WALK_WARM_UP_FRAMES 3
 #define JUMP_WARM_UP_FRAMES 4
 
-#define JUMP_X_COORD    (JUMP_INIT_SPEED * COS60 * this->jumpTime)
+#define JUMP_X_COORD    (JUMP_INIT_SPEED * COS60 * this->jumpTime) //calculo de las coord segun vel y tiempo
 #define JUMP_Y_COORD    (JUMP_INIT_SPEED * SIN60 * this->jumpTime \
                         - this->worldGravity * this->jumpTime * this->jumpTime  / 2)
 
@@ -57,17 +57,17 @@ Worm::~Worm()
 	this->spd = { 0 };
 }
 
-bool Worm::setMaximumPosition(Point_t pos)
+bool Worm::setMaximumPosition(Point_t pos)  //devuelve la pos max
 {
     return position.setMaximumCoordinates(pos.x, pos.y);
 }
 
-bool Worm::setPosition(Point_t pos)
+bool Worm::setPosition(Point_t pos) //devuelve pos
 {
     return position.setPosition(pos.x, pos.y);
 }
 
-bool Worm::setPointingDirection(WormPointing dir)
+bool Worm::setPointingDirection(WormPointing dir) //devulve direc 
 {
 	if (dir == LEFT || dir == RIGHT) 
 	{
@@ -81,18 +81,18 @@ bool Worm::setPointingDirection(WormPointing dir)
     return true;
 }
 
-void Worm::setTouchingFloor(bool value)
+void Worm::setTouchingFloor(bool value)  //me fijo si esta tocando el piso
 {
 	this->isTouchingFloor = value;
 }
 
-bool Worm::setSpeed(speed_t newSpd)
+bool Worm::setSpeed(speed_t newSpd)  //defino la vel del worm
 {
 	this->spd = newSpd;
 	return true;
 }
 
-const Point_t* Worm::getCurrentPosition(void)
+const Point_t* Worm::getCurrentPosition(void)  //devuelve pos actual
 {
     return this->position.getPosition();
 }
@@ -102,7 +102,7 @@ void Worm::getCurrentPosition(coord_t& x, coord_t& y)
     return;
 }
 
-WormPointing Worm::getPointingDirection(void)
+WormPointing Worm::getPointingDirection(void)  //devuelve direc a la que apunta actualmente
 {
     return this->pointingDirection;
 }
@@ -113,30 +113,29 @@ void Worm::getPointingDirection(WormPointing& direction)
     return;
 }
 
-int Worm::getFrame(void)
+int Worm::getFrame(void)  //devuekve en que frame esta para graficar
 {
 	return this->frame;
 }
 
-bool Worm::getTouchingFloor(void)
+bool Worm::getTouchingFloor(void)  //devuelve si esta tocando o no el piso actualmente
 {
 	return this->isTouchingFloor;
 }
 
-speed_t Worm::getSpeed(void)
+speed_t Worm::getSpeed(void)  //devuvlve la vel actual
 {
 	return this->spd;
 }
 
-WormStatesType Worm::getState(void)
+WormStatesType Worm::getState(void)  //devuelve estado actual
 {
 	return this->state;
 }
 
-bool Worm::setState(WormStatesType newState)
+bool Worm::setState(WormStatesType newState) 
 {
-	if (newState == IDLE 
-		|| newState == WARM_JUMP || newState == WARM_MOVE)
+	if (newState == IDLE || newState == WARM_JUMP || newState == WARM_MOVE)
 	{
 		this->state = newState;
 		if (newState == IDLE)
@@ -149,7 +148,7 @@ bool Worm::setState(WormStatesType newState)
 	return false;
 }
 
-void Worm::update() 
+void Worm::update() //se actualizan los frames y velocidades
 {
 	switch (this->state)
 	{

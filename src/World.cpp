@@ -2,24 +2,24 @@
 #include "World.h"
 
 
-World::World(Point_t worldSize)
+World::World(Point_t worldSize) //defino el mundo
 {
 	Point_t initPos = { 0 };
-	worldSize.x = fabs(worldSize.x);
+	worldSize.x = fabs(worldSize.x); //size del mundo
 	worldSize.y = fabs(worldSize.y);
 
-	initPos.x = 10.0 + WORM_WIDTH;
+	initPos.x = 10.0 + WORM_WIDTH;  //inicializo la pos del worm izq
 	initPos.y = 0;
 	wormArr[0] = Worm(initPos, worldSize, RIGHT);
 	
-	initPos.x = worldSize.x - 10.0 - WORM_WIDTH;
+	initPos.x = worldSize.x - 10.0 - WORM_WIDTH;  //inicializo la pos del worm der
 	initPos.y = 0;
 	wormArr[1] = Worm(initPos, worldSize, LEFT);
 
 	return;
 }
 
-void World::update(WormsByName worm)
+void World::update(WormsByName worm) //actualizo los worms
 {
 	Point_t auxPoint;
 	speed_t auxSpeed;
@@ -65,7 +65,7 @@ Worm* World::getWormArr(void)
 	return this->wormArr;
 }
 
-void World::warmUpWorm(WormsByName name, WormActions action, WormPointing direction)
+void World::warmUpWorm(WormsByName name, WormActions action, WormPointing direction) //cambia los estados de los worm segun que este hacendo 
 {
 #ifdef DEBUG
 	std::cout << "Warm up.." << std::endl;
@@ -95,7 +95,7 @@ void World::warmUpWorm(WormsByName name, WormActions action, WormPointing direct
 	return;
 }
 
-bool World::forceWormStop(WormsByName name)
+bool World::forceWormStop(WormsByName name)  //stop a los worms
 {
 	Worm* worm = getWorm(name);
 	if (worm == NULL) return false;
@@ -104,7 +104,7 @@ bool World::forceWormStop(WormsByName name)
 	return true;
 }
 
-Worm* World::getWorm(WormsByName name)
+Worm* World::getWorm(WormsByName name)  //devuelve a que worm se esta refiriendo
 {
 	if (name == WormsByName::Isaac)
 	{

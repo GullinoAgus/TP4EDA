@@ -15,7 +15,7 @@ Coordinates::Coordinates() {
     this->position = { 0 };
  }
 
-Coordinates::Coordinates(coord_t x, coord_t y, coord_t maxX, coord_t maxY) {
+Coordinates::Coordinates(coord_t x, coord_t y, coord_t maxX, coord_t maxY) {  //verifico que las coord max sean validas y las setteo
     this->maximumCoordinates = { 0 };
     this->position = { 0 };
 
@@ -48,13 +48,13 @@ Coordinates::~Coordinates(void) {
 void Coordinates::displace(coord_t x, coord_t y) {
     this->position.x += x;
     this->position.y += y;
-    if (isless(this->position.x, 0.0)) {
+    if (isless(this->position.x, 0.0)) { //si el worm quiere salirse del area valida, hace que se quede en la pos x limite
         this->position.x = 0;
     }
     else if (isgreater(this->position.x, maximumCoordinates.x)) {
         this->position.x = this->maximumCoordinates.x;
     }
-    if (isless(this->position.y, 0.0)) {
+    if (isless(this->position.y, 0.0)) {  // si el worm quiere salirse del area valida, hace que se quede en la pos y limite
         this->position.y = 0;
     }
     else if (isgreater(this->position.y, maximumCoordinates.y)) {
@@ -62,7 +62,7 @@ void Coordinates::displace(coord_t x, coord_t y) {
     }
 }
 
-void Coordinates::getPosition(coord_t& x, coord_t& y) {
+void Coordinates::getPosition(coord_t& x, coord_t& y) { //obtengo pos
     x = this->position.x;
     y = this->position.y;
     return;
@@ -85,7 +85,7 @@ bool Coordinates::setMaximumCoordinates(coord_t x, coord_t y) {
 }
 
 
-bool Coordinates::setPosition(coord_t x, coord_t y)
+bool Coordinates::setPosition(coord_t x, coord_t y) //evita que el worm se salga del area valida de juego
 {
     if (isless(x, 0.0))
     {

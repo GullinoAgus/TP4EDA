@@ -28,7 +28,7 @@ enum IsaacKeys
 {
 	ISAAC_F_KEY = 0,
 	ISAAC_N_KEYS = KEYS_BY_WORM,
-	ISAAC_KEY_LEFT = ALLEGRO_KEY_A,
+	ISAAC_KEY_LEFT = ALLEGRO_KEY_A, //Isaac se mueve con las teclas A, W, D
 	ISAAC_KEY_UP = ALLEGRO_KEY_W,
 	ISAAC_KEY_RIGHT = ALLEGRO_KEY_D,
 };
@@ -37,7 +37,7 @@ enum RayKeys
 {
 	RAY_F_KEY = ISAAC_N_KEYS,
 	RAY_N_KEYS = KEYS_BY_WORM,
-	RAY_KEY_LEFT = ALLEGRO_KEY_LEFT,
+	RAY_KEY_LEFT = ALLEGRO_KEY_LEFT, //Ray se mueve con las flechas de izq, der y arriba
 	RAY_KEY_UP = ALLEGRO_KEY_UP,
 	RAY_KEY_RIGHT = ALLEGRO_KEY_RIGHT,
 };
@@ -64,7 +64,7 @@ Gui::Gui()
 	: world({PLAYABLE_AREA_X2-PLAYABLE_AREA_X1-(double)WORM_WIDTH, PLAYABLE_AREA_Y2-PLAYABLE_AREA_Y1})
 {
 
-	string dirWalkingTexts = "Resources\\wwalking\\wwalk-F";
+	string dirWalkingTexts = "Resources\\wwalking\\wwalk-F"; //paths de las fotos
 	string dirJumpingTexts = "Resources\\wjump\\wjump-F";
 
 	if (!this->initAllegro())
@@ -72,7 +72,7 @@ Gui::Gui()
 
 	this->closeWindow = false;
 
-	for (int i = WF1; i < N_FRAMES; i++)
+	for (int i = WF1; i < N_FRAMES; i++) //cargo todas las fotos de walk y jump
 	{
 		if (i <= WF15 )
 		{
@@ -84,13 +84,13 @@ Gui::Gui()
 			this->wormTextArr[i] = Bitmap(&(dirJumpingTexts + to_string(i - WF15) + ".png")[0]);
 		}
 		
-		if (this->wormTextArr[i].bitmap == NULL)
+		if (this->wormTextArr[i].bitmap == NULL) //error
 		{
 			cout << "Bitmap " << i << " could not be loaded." << endl;
 			return;
 		}
 	}
-	this->worldText = Bitmap("Resources\\Scenario.png");
+	this->worldText = Bitmap("Resources\\Scenario.png"); //cargo el fondo
 	if (this->worldText.bitmap == NULL)
 	{
 		cout << "Bitmap could not be loaded." << endl;
@@ -115,7 +115,7 @@ Gui::Gui()
 	}
 }
 
-Gui::~Gui(void)
+Gui::~Gui(void) //destruyo allegro y gui
 {
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
@@ -128,7 +128,7 @@ Gui::~Gui(void)
     if (this->display != NULL) al_destroy_display(this->display);
 }
 
-bool Gui::initAllegro(void)
+bool Gui::initAllegro(void) //inicializo allegro
 {
 	if (!al_init()) {
 		fprintf(stderr, " failed to initialize allegro !\n");
@@ -175,7 +175,7 @@ bool Gui::initAllegro(void)
 	return true;
 }
 
-bool Gui::show(void)
+bool Gui::show(void)  //verifico que funcionen las cosas de allegro y las voy arrancando
 {
 	if (this->display == NULL)
 	{
@@ -238,7 +238,7 @@ bool Gui::show(void)
 	return true;
 }
 
-void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
+void Gui::eventDispatcher(ALLEGRO_EVENT& ev) //voy viendo que evento esta sucediendo
 {
 	int index = -1;
 	switch (ev.type)
@@ -318,7 +318,7 @@ void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 	}
 }
 
-bool Gui::startMoving(int keyIndex)
+bool Gui::startMoving(int keyIndex)  //se mueven los worms
 {
 	bool validKey = true;
 
@@ -348,7 +348,7 @@ bool Gui::startMoving(int keyIndex)
 	return validKey;
 }
 
-bool Gui::startJumping(int keyIndex)
+bool Gui::startJumping(int keyIndex)  //saltan los worms
 {
 	bool validKey = true;
 
@@ -370,7 +370,7 @@ bool Gui::startJumping(int keyIndex)
 	return validKey;
 }
 
-bool Gui::stopMoving(int keyIndex)
+bool Gui::stopMoving(int keyIndex)  //freno los worms
 {
 	int keyCode = getKeyCodeByIndex(keyIndex);
 	if (keyCode == ISAAC_KEY_LEFT || keyCode == ISAAC_KEY_RIGHT)
@@ -482,7 +482,7 @@ bool Gui::noKeyPressed(int keyIndex)
 	return noPressed;
 }
 
-bool Gui::drawWorld(void)
+bool Gui::drawWorld(void) //dibujo al mundo
 {
 	al_clear_to_color(al_map_rgb(COLOR_BACKGROUND_RGB));
 	// Bitmap is drawn this way so the display can fit in my monitor :)
@@ -496,7 +496,7 @@ bool Gui::drawWorld(void)
 	return true;
 }
 
-bool Gui::drawWorms(void)
+bool Gui::drawWorms(void) //dibujo a lo worms
 {
 	Point_t position = { 0 };
 	Worm* wrmarr = world.getWormArr();
@@ -532,7 +532,7 @@ bool Gui::drawWorms(void)
 		int flip = wrmarr[i].getPointingDirection() == LEFT ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 		int frame = wrmarr[i].getFrame();
 
-		al_draw_bitmap(this->wormTextArr[frame].bitmap, position.x, position.y, flip);
+		al_draw_bitmap(this->wormTextArr[frame].bitmap, position.x, position.y, flip); //dibujo el frame del worm correspondiente
 
 	}
 
