@@ -19,33 +19,34 @@ World::World(Point_t worldSize)
 	return;
 }
 
-void World::update()
+void World::update(WormsByName worm)
 {
 	Point_t auxPoint;
 	speed_t auxSpeed;
-	for (int i = 0; i < MAX_WORMS; i++)
-	{
-		this->wormArr[i].update();
+	
+	Worm* worm_ptr = this->getWorm(worm);
+	if (worm_ptr == NULL) return;
 
-		auxSpeed = this->wormArr[i].getSpeed();
-		auxPoint = *this->wormArr[i].getCurrentPosition();
+		worm_ptr->update();
+
+		auxSpeed = worm_ptr->getSpeed();
+		auxPoint = *worm_ptr->getCurrentPosition();
 
 		auxPoint.x += auxSpeed.x;
 		auxPoint.y += auxSpeed.y;
 		if (auxPoint.y > 0.0)
 		{
-			wormArr[i].setTouchingFloor(true);
+			worm_ptr->setTouchingFloor(true);
 			auxPoint.y = (coord_t) 0.0;
 		}
-		if (!this->wormArr[i].getTouchingFloor())
+		if (!worm_ptr->getTouchingFloor())
 		{
 			auxSpeed.y += GRAVITY;
 		}
 
-		this->wormArr[i].setPosition(auxPoint);
-		this->wormArr[i].setSpeed(auxSpeed);
+		worm_ptr->setPosition(auxPoint);
+		worm_ptr->setSpeed(auxSpeed);
 		
-	}
 
 #ifdef  DEBUG
 	std::cout 

@@ -24,7 +24,7 @@ class World
 public:
 	// Corners of the rectangle with the playable area.
 	World(Point_t worldSize);
-	void update(void);
+	void update(WormsByName worm);
 
 	Worm* getWormArr(void);
 

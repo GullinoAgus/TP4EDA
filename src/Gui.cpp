@@ -12,16 +12,54 @@
 #include "Gui.h"
 #include "config.h"
 
-#define DISPLAY_WIDTH	1120		//TODO: Adjust to background. 
-#define DISPLAY_HEIGHT	696			//		Set like this to fit my screen :) 
+#define DISPLAY_WIDTH				1120	// Set like this to fit my screen :) 
+#define DISPLAY_HEIGHT				696	
 
-#define BACKGROUND_DISPLACEMENT_X	410.0	// See todo in previous line.
+#define BACKGROUND_DISPLACEMENT_X	410.0	// See comment in DISPLAY_WIDTH.
 #define BACKGROUND_DISPLACEMENT_Y	0.0
 
-#define PLAYABLE_AREA_X1	(702.0-BACKGROUND_DISPLACEMENT_X+WORM_WIDTH)
-#define PLAYABLE_AREA_Y1	(395.0-BACKGROUND_DISPLACEMENT_Y)
-#define PLAYABLE_AREA_X2	(1211.0-BACKGROUND_DISPLACEMENT_X)
-#define PLAYABLE_AREA_Y2	(616.0-BACKGROUND_DISPLACEMENT_Y)
+#define COLOR_BACKGROUND_RGB		200,100,050		// Arguments for al_map_rgb 
+
+#define PLAYABLE_AREA_X1			(702.0-BACKGROUND_DISPLACEMENT_X-(WORM_WIDTH/2))
+#define PLAYABLE_AREA_Y1			(395.0-BACKGROUND_DISPLACEMENT_Y)
+#define PLAYABLE_AREA_X2			(1211.0-BACKGROUND_DISPLACEMENT_X)
+#define PLAYABLE_AREA_Y2			(616.0-BACKGROUND_DISPLACEMENT_Y)
+
+#define ARRSIZE(a)					(sizeof(a)/sizeof(a[0]))
+
+enum IsaacKeys
+{
+	ISAAC_F_KEY = 0,
+	ISAAC_N_KEYS = KEYS_BY_WORM,
+	ISAAC_KEY_LEFT = ALLEGRO_KEY_A,
+	ISAAC_KEY_UP = ALLEGRO_KEY_W,
+	ISAAC_KEY_RIGHT = ALLEGRO_KEY_D,
+};
+
+enum RayKeys
+{
+	RAY_F_KEY = ISAAC_N_KEYS,
+	RAY_N_KEYS = KEYS_BY_WORM,
+	RAY_KEY_LEFT = ALLEGRO_KEY_LEFT,
+	RAY_KEY_UP = ALLEGRO_KEY_UP,
+	RAY_KEY_RIGHT = ALLEGRO_KEY_RIGHT,
+};
+
+
+/* X, Y, FLIP */
+const int spectators[][3]
+{
+	{722, 176, 1},
+	{752, 176, 1},
+	{786, 176, 1},
+	{816, 178, 1},
+	{862, 178, 1},
+	{1030,178, 0},
+	{1070,178, 0},
+	{1100,176, 0},
+	{1140,176, 0},
+	{1170,176, 0},
+};
 
 using namespace std;
 
@@ -31,7 +69,7 @@ Gui::Gui()
 
 	string dirWalkingTexts = "Resources\\wwalking\\wwalk-F";
 	string dirJumpingTexts = "Resources\\wjump\\wjump-F";
-	
+
 	if (!this->initAllegro())
 		return;
 
@@ -64,6 +102,23 @@ Gui::Gui()
 		cout << "Bitmap could not be loaded." << endl;
 		return;
 	}
+
+	this->spectatorsBitmap = WF1;
+	this->spectatorsBitmapForward = true;
+
+	// Keyboard
+	this->validKeyCodes[0] = ISAAC_KEY_LEFT;
+	this->validKeyCodes[1] = ISAAC_KEY_UP;
+	this->validKeyCodes[2] = ISAAC_KEY_RIGHT;
+	this->validKeyCodes[3] = RAY_KEY_LEFT;
+	this->validKeyCodes[4] = RAY_KEY_UP;
+	this->validKeyCodes[5] = RAY_KEY_RIGHT;
+
+	for (int i = 0; i < WORM_KEYS ; i++)
+	{
+		this->keysDown[i] = false;
+		this->keysDownTime[i] = 0;
+	}
 }
 
 Gui::~Gui(void)
@@ -77,6 +132,7 @@ Gui::~Gui(void)
 	al_shutdown_image_addon();
 
 	if (this->timer.fps != NULL) al_destroy_timer(this->timer.fps);
+	if (this->timer.spectators != NULL) al_destroy_timer(this->timer.spectators);
     if (this->evQueue != NULL) al_destroy_event_queue(this->evQueue);
     if (this->display != NULL) al_destroy_display(this->display);
 }
@@ -124,12 +180,6 @@ bool Gui::initAllegro(void)
 	al_register_event_source(this->evQueue, al_get_display_event_source(this->display));
 	al_register_event_source(this->evQueue, al_get_keyboard_event_source());
 	al_register_event_source(this->evQueue, al_get_mouse_event_source());
-
-	for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
-	{
-		this->keysDown[i] = false;
-		this->keysDownTime[i] = 0;
-	}
 
 	return true;
 }
@@ -183,8 +233,18 @@ bool Gui::show(void)
 	}
 	al_register_event_source(this->evQueue, al_get_timer_event_source(this->timer.fps));
 
+	this->timer.spectators = al_create_timer(15.0/FPS);
+	if (this->timer.spectators == NULL)
+	{
+		fprintf(stderr, "Unable to create timer. Aborting.\n");
+		return false;
+	}
+	al_register_event_source(this->evQueue, al_get_timer_event_source(this->timer.spectators));
+
+
 	// Start timers
 	al_start_timer(this->timer.fps);
+	al_start_timer(this->timer.spectators);
 
 	ALLEGRO_EVENT ev;
 	while (!this->closeWindow)
@@ -201,6 +261,7 @@ bool Gui::show(void)
 void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 {
 	//ImGui_ImplAllegro5_ProcessEvent(&ev);
+	int index = -1;
 	switch (ev.type)
 	{
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -208,31 +269,35 @@ void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 			break;
 
 		case ALLEGRO_EVENT_KEY_DOWN:
-			// Pressing ALT generates a lot of unnecessary trash in allegro.
-			// Let's ignore it.
-			if (ev.keyboard.keycode != ALLEGRO_KEY_ALT)
+			index = this->getKeyIndexByCode(ev.keyboard.keycode);
+			if (index >= 0 && noKeyPressed(index))
 			{
-				this->keysDown[ev.keyboard.keycode] = true;
+				this->keysDown[index] = true;
 			}
 			
 			break;
 
 		case ALLEGRO_EVENT_KEY_UP:
-			this->keysDown[ev.keyboard.keycode] = false;
-
-			// Only stops movement when key was not pressed long enough
-			if (islessequal(this->keysDownTime[ev.keyboard.keycode], WORM_IDLE_TIME)) 
+			index = this->getKeyIndexByCode(ev.keyboard.keycode);
+			if (index >= 0)
 			{
-				this->keysDownTime[ev.keyboard.keycode] = 0;
-				this->stopMoving(ev.keyboard.keycode);
+				this->keysDown[index] = false;
+
+				// Only stops movement when key was not pressed long enough
+				if (isgreater(this->keysDownTime[index], 0.0) && islessequal(this->keysDownTime[index], WORM_IDLE_TIME)) 
+				{
+					this->keysDownTime[index] = 0;
+					this->stopMoving(index);
+				}
 			}
+
 			break;
 
 		case ALLEGRO_EVENT_TIMER:
 			if (ev.timer.source == this->timer.fps)
 			{
 				// Increase key-pressed timer
-				for (int key = 0; key < ALLEGRO_KEY_MAX; key++)
+				for (int key = 0; key < WORM_KEYS; key++)
 				{
 					// New key-press event
 					if (this->keysDown[key] && islessequal(this->keysDownTime[key], 0.0))
@@ -263,6 +328,10 @@ void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 				this->drawWorms();
 				al_flip_display();
 			}
+			if (ev.timer.source == this->timer.spectators) 
+			{
+				this->updateSpectatorsBitmap();
+			}
 			break;
 
 		default:
@@ -270,25 +339,25 @@ void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 	}
 }
 
-bool Gui::startMoving(int key)
+bool Gui::startMoving(int keyIndex)
 {
 	bool validKey = true;
 
-	switch (key)
+	switch (this->validKeyCodes[keyIndex])
 	{
-		case ALLEGRO_KEY_A:
+		case ISAAC_KEY_LEFT:
 			world.warmUpWorm(WormsByName::Isaac, WormActions::WALK, LEFT);
 			break;
 
-		case ALLEGRO_KEY_D:
+		case ISAAC_KEY_RIGHT:
 			world.warmUpWorm(WormsByName::Isaac, WormActions::WALK, RIGHT);
 			break;
 
-		case ALLEGRO_KEY_LEFT:
+		case RAY_KEY_LEFT:
 			world.warmUpWorm(WormsByName::Ray, WormActions::WALK, LEFT);
 			break;
 
-		case ALLEGRO_KEY_RIGHT:
+		case RAY_KEY_RIGHT:
 			world.warmUpWorm(WormsByName::Ray, WormActions::WALK, RIGHT);
 			break;
 
@@ -300,17 +369,17 @@ bool Gui::startMoving(int key)
 	return validKey;
 }
 
-bool Gui::startJumping(int key)
+bool Gui::startJumping(int keyIndex)
 {
 	bool validKey = true;
 
-	switch (key)
+	switch (this->validKeyCodes[keyIndex])
 	{
-		case ALLEGRO_KEY_W:
+		case ISAAC_KEY_UP:
 			world.warmUpWorm(WormsByName::Isaac, WormActions::JUMP, NOT_INIT);
 			break;
 
-		case ALLEGRO_KEY_UP:
+		case RAY_KEY_UP:
 			world.warmUpWorm(WormsByName::Ray, WormActions::JUMP, NOT_INIT);
 			break;
 
@@ -322,14 +391,15 @@ bool Gui::startJumping(int key)
 	return validKey;
 }
 
-bool Gui::stopMoving(int key)
+bool Gui::stopMoving(int keyIndex)
 {
-	if (key == ALLEGRO_KEY_A || key == ALLEGRO_KEY_D)
+	int keyCode = getKeyCodeByIndex(keyIndex);
+	if (keyCode == ISAAC_KEY_LEFT || keyCode == ISAAC_KEY_RIGHT)
 	{
 		world.forceWormStop(WormsByName::Isaac);
 	}
 
-	if (key == ALLEGRO_KEY_LEFT || key == ALLEGRO_KEY_RIGHT)
+	if (keyCode == RAY_KEY_LEFT || keyCode == RAY_KEY_RIGHT)
 	{
 		world.forceWormStop(WormsByName::Ray);
 	}
@@ -338,64 +408,112 @@ bool Gui::stopMoving(int key)
 
 bool Gui::wormEvent()
 {
-	for (int key = 0; key < ALLEGRO_KEY_MAX; key++)
+	for (int key = 0; key < WORM_KEYS; key++)
 	{
-		if (islessequal(keysDownTime[key], 0.0)) continue;
-
-
-		if (isValidWormKey(WormsByName::Isaac, key)
-			|| isValidWormKey(WormsByName::Ray, key))
+		if (isgreater(keysDownTime[key], 0.0))
 		{
 #ifdef DEBUG
 			cout << "key: " << key << " time: " << keysDownTime[key] << endl;
 #endif // DEBUG
-			world.update();
+
+			if (key < ISAAC_N_KEYS)
+			{
+				world.update(WormsByName::Isaac);
+			}
+			else
+			{
+				world.update(WormsByName::Ray);
+			}
 		}
 	}
 
 	return true;
 }
 
-bool Gui::isValidWormKey(WormsByName worm, int key)
+int Gui::getKeyIndexByCode(int allegro_key_code)
 {
-	bool valid = false;
+	for (int i = 0; i < WORM_KEYS; i++)
+	{
+		if (this->validKeyCodes[i] == allegro_key_code)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+int Gui::getKeyCodeByIndex(int keyIndex)
+{
+	if (keyIndex < 0 || keyIndex >= WORM_KEYS) return -1;
+	return this->validKeyCodes[keyIndex];
+}
+
+
+bool Gui::onlyOneWormKeyPressed(WormsByName worm)
+{
+	bool onePressed = false;
+
+	int startIndex = 0, endIndex = 0;
 	if (worm == WormsByName::Isaac)
 	{
-		switch (key)
-		{
-			case ALLEGRO_KEY_A:
-			case ALLEGRO_KEY_W:
-			case ALLEGRO_KEY_D:
-				valid = true;
-				break;
-		}
+		startIndex = ISAAC_F_KEY;
+		endIndex = ISAAC_N_KEYS + startIndex;
 	}
-
 	else if (worm == WormsByName::Ray)
 	{
-		switch (key)
+		startIndex = RAY_F_KEY;
+		endIndex = RAY_N_KEYS + startIndex;
+	}
+
+	for (int key = startIndex; key < endIndex; key++)
+	{
+		if ((this->keysDown[key] || isgreater(this->keysDownTime[key], 0.0)))
 		{
-			case ALLEGRO_KEY_LEFT:
-			case ALLEGRO_KEY_UP:
-			case ALLEGRO_KEY_RIGHT:
-				valid = true;
-				break;
+			if (onePressed)
+			{
+				return false;
+			}
+
+			onePressed = true;
 		}
 	}
 
-	return valid;
+	return onePressed;
+}
 
+/* True if no other key has been pressed for the worm with this key */
+bool Gui::noKeyPressed(int keyIndex)
+{
+	if (keyIndex > WORM_KEYS) return false;
+
+	bool noPressed = true;
+	int startIndex = keyIndex < ISAAC_N_KEYS ? ISAAC_F_KEY : RAY_F_KEY;
+	int endIndex = keyIndex < ISAAC_N_KEYS ? ISAAC_N_KEYS : RAY_N_KEYS;
+	
+	endIndex += startIndex;
+
+	for (int key = startIndex; key < endIndex; key++)
+	{
+		if ((this->keysDown[key] || isgreater(this->keysDownTime[key], 0.0)))
+		{
+			noPressed = false;
+		}
+	}
+
+	return noPressed;
 }
 
 bool Gui::drawWorld(void)
 {
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	al_clear_to_color(al_map_rgb(COLOR_BACKGROUND_RGB));
 	// Bitmap is drawn this way so the display can fit in my monitor :)
 	al_draw_bitmap_region(this->worldText.bitmap, 
 		BACKGROUND_DISPLACEMENT_X, BACKGROUND_DISPLACEMENT_Y, 
 		DISPLAY_WIDTH, DISPLAY_HEIGHT,
 		0, 0, 0);
-	/*al_draw_bitmap(this->worldText.bitmap, 0, 0, 0);*/
+
+	this->drawSpectators();
+
 	return true;
 }
 
@@ -442,6 +560,37 @@ bool Gui::drawWorms(void)
 	return true;
 }
 
+bool Gui::drawSpectators(void)
+{
+	int flip = 0;
+	for (int i = 0; i < ARRSIZE(spectators); i++)
+	{
+		flip = spectators[i][2] ? ALLEGRO_FLIP_HORIZONTAL : 0;
+		al_draw_bitmap(this->wormTextArr[this->spectatorsBitmap].bitmap, 
+			spectators[i][0]-BACKGROUND_DISPLACEMENT_X, 
+			spectators[i][1]-2*WORM_HEIGHT/3-BACKGROUND_DISPLACEMENT_Y, flip);
+	}
+	
+
+	return true;
+}
+
+void Gui::updateSpectatorsBitmap(void)
+{
+	if (this->spectatorsBitmap == WF4)
+	{
+		this->spectatorsBitmapForward = false;
+	}
+	else if (this->spectatorsBitmap == WF1)
+	{
+		this->spectatorsBitmapForward = true;
+	}
+
+	this->spectatorsBitmapForward ? this->spectatorsBitmap++ : this->spectatorsBitmap--;
+
+	return;
+}
+
 #ifdef DEBUG
 bool Gui::drawPlayableBox(void)
 {
@@ -456,4 +605,3 @@ bool Gui::drawPlayableBox(void)
 	return true;
 }
 #endif
-

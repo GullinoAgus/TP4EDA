@@ -5,6 +5,10 @@
 #include "Bitmap.h"
 #include <allegro5/allegro5.h>
 
+#define KEYS_BY_WORM	(3)
+#define N_WORMS			(2)
+#define WORM_KEYS		(KEYS_BY_WORM * N_WORMS)
+
 class Gui
 {
 public:
@@ -21,13 +25,19 @@ private:
 	Bitmap worldText;
 	Bitmap wormTextArr[N_FRAMES];
 
+	// Add some spectators !
+	int spectatorsBitmap;
+	bool spectatorsBitmapForward;
+
 	struct
 	{
 		ALLEGRO_TIMER* fps;
+		ALLEGRO_TIMER* spectators;
 	} timer;
 
-	bool keysDown[ALLEGRO_KEY_MAX];
-	double keysDownTime[ALLEGRO_KEY_MAX];
+	int validKeyCodes[WORM_KEYS];
+	bool keysDown[WORM_KEYS];
+	double keysDownTime[WORM_KEYS];
 
 	World world;
 
@@ -35,15 +45,21 @@ private:
 	bool initImGui(void);
 	void eventDispatcher(ALLEGRO_EVENT& ev);
 
-	bool startMoving(int key);
-	bool startJumping(int key);
-	bool stopMoving(int key);
-
-	bool isValidWormKey(WormsByName worm, int key);
+	bool startMoving(int keyIndex);
+	bool startJumping(int keyIndex);
+	bool stopMoving(int keyIndex);
 	bool wormEvent(void);
+
+	int getKeyIndexByCode(int allegro_key_code); /* -1 if not found*/
+	int getKeyCodeByIndex(int keyIndex);
+	bool isValidWormKey(WormsByName worm, int key);
+	bool onlyOneWormKeyPressed(WormsByName worm);
+	bool noKeyPressed(int keyIndex);
 
 	bool drawWorld();
 	bool drawWorms();
+	bool drawSpectators();
+	void updateSpectatorsBitmap();
 
 #ifdef DEBUG
 	bool drawPlayableBox(void);
