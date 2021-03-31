@@ -141,10 +141,7 @@ bool Worm::setState(WormStatesType newState)
 		this->state = newState;
 		if (newState == IDLE)
 		{
-			this->frameCounter = 0;
-			this->frame = WF1;
-			this->spd.x = 0;
-			this->spd.y = 0;
+			this->update();
 		}
 		return true;
 	}

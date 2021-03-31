@@ -32,8 +32,6 @@ Gui::Gui()
 	string dirWalkingTexts = "Resources\\wwalking\\wwalk-F";
 	string dirJumpingTexts = "Resources\\wjump\\wjump-F";
 	
-	Worm* p2worm = world.getWormArr();
-
 	if (!this->initAllegro())
 		return;
 
@@ -247,7 +245,7 @@ void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 					else if (isgreater(this->keysDownTime[key], 1.0))
 					{
 						this->keysDownTime[key] = 0.0;
-						//this->stopMoving(key);
+						this->stopMoving(key);
 					}
 					// Key pressed or movement in progress
 					else if (this->keysDown[key] || isgreater(this->keysDownTime[key], 0.0))
@@ -340,8 +338,6 @@ bool Gui::stopMoving(int key)
 
 bool Gui::wormEvent()
 {
-	Worm* worms = this->world.getWormArr();
-
 	for (int key = 0; key < ALLEGRO_KEY_MAX; key++)
 	{
 		if (islessequal(keysDownTime[key], 0.0)) continue;
@@ -409,13 +405,13 @@ bool Gui::drawWorms(void)
 	for (int i = 0; i < MAX_WORMS; i++)
 	{
 		wrmarr[i].getCurrentPosition(position.x, position.y);
-		WormPointing pointing = wrmarr[i].getPointingDirection();
 
 
 		position.x += PLAYABLE_AREA_X1;	// Set X = 0 relative to playable area
 		position.y += PLAYABLE_AREA_Y2;	// Set Y = 0 relative to playable area
 
-#ifdef DEBUG2
+#ifdef DEBUG_FULL
+		WormPointing pointing = wrmarr[i].getPointingDirection();
 		Point_t pointVertex = { 0 };
 		pointVertex.x = position.x;
 		pointVertex.y = position.y + (WORM_HEIGHT / 2);
@@ -435,30 +431,12 @@ bool Gui::drawWorms(void)
 #endif
 
 		int flip = wrmarr[i].getPointingDirection() == LEFT ? 0 : ALLEGRO_FLIP_HORIZONTAL;
-		//int frame = WF1;
 		int frame = wrmarr[i].getFrame();
 
 		if (!flip)
 		{
 			position.x -= (double)WORM_WIDTH;
 		}
-	/*	switch (wrmarr[i].getState())
-		{
-			case WARM_MOVE:
-				frame = wrmarr[i].getFrame();
-				break;
-			case MOVING:
-				
-		}
-		switch (wrmarr[i].getFrame())
-		{
-			case WF1:
-			case WF2:
-			case WF3:
-
-			default:
-				break;
-		}*/
 
 		al_draw_bitmap(this->wormTextArr[frame].bitmap, position.x, position.y, flip);
 
