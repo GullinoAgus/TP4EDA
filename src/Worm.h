@@ -3,8 +3,8 @@
 
 #include "Coordinates.h"
 
-#define WORM_HEIGHT 31          
-#define WORM_WIDTH  WORM_HEIGHT
+#define WORM_HEIGHT (60)
+#define WORM_WIDTH  (WORM_HEIGHT-20)
 
 
 typedef struct {

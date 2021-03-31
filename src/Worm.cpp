@@ -135,7 +135,6 @@ WormStatesType Worm::getState(void)
 
 bool Worm::setState(WormStatesType newState)
 {
-	//std::cout << "New state: " << newState << std::endl;
 	if (newState == IDLE 
 		|| newState == WARM_JUMP || newState == WARM_MOVE)
 	{
@@ -155,10 +154,6 @@ bool Worm::setState(WormStatesType newState)
 
 void Worm::update() 
 {
-#ifdef DEBUG
-	//std::cout << "Worms update called!" << std::endl;
-#endif
-
 	switch (this->state)
 	{
 		case IDLE:
@@ -167,45 +162,47 @@ void Worm::update()
 			this->spd.x = 0;
 			this->spd.y = 0;
 			break;
+
 		case WARM_MOVE:
-			if (this->frameCounter == CONFIRMATION_FRAMES + 1)
+			if ( frameCounter > CONFIRMATION_FRAMES && this->frameCounter < CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES)
 			{
-				this->frame = WF3;
-			}
-			else if (this->frameCounter <= CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES - 1 && frameCounter > CONFIRMATION_FRAMES + 1)
-			{
-				this->frame--;
+				this->frame++;
 			}
 			else if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES)
 			{
-				this->frame--;
+				this->frame++;
 				this->state = MOVING;
-				//this->spd.x = LATERAL_MOVE_SPEED / (double)(FPS - (CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES));
-				//this->spd.x *= (this->pointingDirection == LEFT) ? -1 : 1;
 			}
 			this->frameCounter++;
 			break;
 
 		case MOVING:
-			if (this->frameCounter == CONFIRMATION_FRAMES + WALK_WARM_UP_FRAMES + 1)
+			if (this->frameCounter <= FPS)
 			{
-				this->frame = WF1;
-			}
-			else if (this->frameCounter <= FPS)
-			{
+				if ((this->frameCounter - 9) % 14 == 0 || (this->frameCounter - 16) % 14 == 0 )
+				{
+					this->frame--;
+				}
+
 				this->frame++;
 			}
 
-			if (this->frame > WF14)
+			if (this->frame > WF15)
 			{
-				this->frame = WF1;
+				if (this->frameCounter >= FPS)
+				{
+					this->frame = WF1;
+				}
+				else
+				{
+					this->frame = WF4;
+				}
 				this->spd.x = 0;
 			}
-			else if (this->frame == WF14)
+			else if (this->frame == WF15)
 			{
 				this->spd.x = 9;
 				this->spd.x *= (this->pointingDirection == LEFT) ? -1 : 1;
-				//this->position.displace(9 * ((this->pointingDirection == LEFT) ? -1 : 1), 0.0);
 			}
 
 			if (this->frameCounter == FPS)

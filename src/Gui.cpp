@@ -10,7 +10,7 @@
 #include <ImGui/imgui_impl_allegro5.h>
 
 #include "Gui.h"
-#include "resource.h"
+#include "config.h"
 
 #define DISPLAY_WIDTH	1120		//TODO: Adjust to background. 
 #define DISPLAY_HEIGHT	696			//		Set like this to fit my screen :) 
@@ -18,17 +18,15 @@
 #define BACKGROUND_DISPLACEMENT_X	410.0	// See todo in previous line.
 #define BACKGROUND_DISPLACEMENT_Y	0.0
 
-#define PLAYABLE_AREA_X1	(702.0-BACKGROUND_DISPLACEMENT_X)
+#define PLAYABLE_AREA_X1	(702.0-BACKGROUND_DISPLACEMENT_X+WORM_WIDTH)
 #define PLAYABLE_AREA_Y1	(395.0-BACKGROUND_DISPLACEMENT_Y)
 #define PLAYABLE_AREA_X2	(1211.0-BACKGROUND_DISPLACEMENT_X)
 #define PLAYABLE_AREA_Y2	(616.0-BACKGROUND_DISPLACEMENT_Y)
 
-#define FPS				50
-
 using namespace std;
 
 Gui::Gui() 
-	: world({PLAYABLE_AREA_X2-PLAYABLE_AREA_X1, PLAYABLE_AREA_Y2-PLAYABLE_AREA_Y1})
+	: world({PLAYABLE_AREA_X2-PLAYABLE_AREA_X1-(double)WORM_WIDTH, PLAYABLE_AREA_Y2-PLAYABLE_AREA_Y1})
 {
 
 	string dirWalkingTexts = "Resources\\wwalking\\wwalk-F";
@@ -406,18 +404,19 @@ bool Gui::drawWorld(void)
 bool Gui::drawWorms(void)
 {
 	Point_t position = { 0 };
-	Worm * wrmarr = world.getWormArr();
+	Worm* wrmarr = world.getWormArr();
 
 	for (int i = 0; i < MAX_WORMS; i++)
 	{
 		wrmarr[i].getCurrentPosition(position.x, position.y);
 		WormPointing pointing = wrmarr[i].getPointingDirection();
-		
-		Point_t pointVertex = { 0 };
+
 
 		position.x += PLAYABLE_AREA_X1;	// Set X = 0 relative to playable area
 		position.y += PLAYABLE_AREA_Y2;	// Set Y = 0 relative to playable area
 
+#ifdef DEBUG2
+		Point_t pointVertex = { 0 };
 		pointVertex.x = position.x;
 		pointVertex.y = position.y + (WORM_HEIGHT / 2);
 
@@ -429,12 +428,40 @@ bool Gui::drawWorms(void)
 		{
 			pointVertex.x += WORM_WIDTH;
 		}
-		al_draw_triangle(position.x, position.y, 
-						position.x, position.y + WORM_HEIGHT,
-						pointVertex.x, pointVertex.y,
-						al_map_rgb(255,0,0), 2.0);
-		int flag = wrmarr[i].getPointingDirection() == LEFT ? 0 : ALLEGRO_FLIP_HORIZONTAL;
-		al_draw_bitmap(this->wormTextArr[0].bitmap, position.x, position.y, flag);
+		al_draw_triangle(position.x, position.y,
+			position.x, position.y + WORM_HEIGHT,
+			pointVertex.x, pointVertex.y,
+			al_map_rgb(255, 0, 0), 2.0);
+#endif
+
+		int flip = wrmarr[i].getPointingDirection() == LEFT ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+		//int frame = WF1;
+		int frame = wrmarr[i].getFrame();
+
+		if (!flip)
+		{
+			position.x -= (double)WORM_WIDTH;
+		}
+	/*	switch (wrmarr[i].getState())
+		{
+			case WARM_MOVE:
+				frame = wrmarr[i].getFrame();
+				break;
+			case MOVING:
+				
+		}
+		switch (wrmarr[i].getFrame())
+		{
+			case WF1:
+			case WF2:
+			case WF3:
+
+			default:
+				break;
+		}*/
+
+		al_draw_bitmap(this->wormTextArr[frame].bitmap, position.x, position.y, flip);
+
 	}
 
 	return true;

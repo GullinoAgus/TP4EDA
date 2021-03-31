@@ -21,17 +21,6 @@ World::World(Point_t worldSize)
 
 void World::update()
 {
-#ifdef  DEBUG
-	/*std::cout 
-		<< "Isaac: "
-		<< "\n\tState: " << getWorm(WormsByName::Isaac)->getState()
-		<< "\n\tFrame: " << getWorm(WormsByName::Isaac)->getFrame()
-		<< "\nRay: "
-		<< "\n\tState: " << getWorm(WormsByName::Ray)->getState()
-		<< "\n\tFrame: " << getWorm(WormsByName::Ray)->getFrame()
-		<< std::endl;*/
-#endif //  DEBUG
-
 	Point_t auxPoint;
 	speed_t auxSpeed;
 	for (int i = 0; i < MAX_WORMS; i++)
@@ -43,11 +32,9 @@ void World::update()
 
 		auxPoint.x += auxSpeed.x;
 		auxPoint.y += auxSpeed.y;
-		//if (auxPoint.y - WORM_HEIGHT < HORIZONTAL)
 		if (auxPoint.y > 0.0)
 		{
 			wormArr[i].setTouchingFloor(true);
-			//auxPoint.y = (coord_t) HORIZONTAL + WORM_HEIGHT;
 			auxPoint.y = (coord_t) 0.0;
 		}
 		if (!this->wormArr[i].getTouchingFloor())
@@ -59,7 +46,17 @@ void World::update()
 		this->wormArr[i].setSpeed(auxSpeed);
 		
 	}
-	
+
+#ifdef  DEBUG
+	std::cout 
+		<< "Isaac: "
+		<< "\n\tState: " << getWorm(WormsByName::Isaac)->getState()
+		<< "\n\tFrame: " << getWorm(WormsByName::Isaac)->getFrame()
+		/*<< "\nRay: "
+		<< "\n\tState: " << getWorm(WormsByName::Ray)->getState()
+		<< "\n\tFrame: " << getWorm(WormsByName::Ray)->getFrame()*/
+		<< std::endl;
+#endif //  DEBUG
 }
 
 Worm* World::getWormArr(void)
