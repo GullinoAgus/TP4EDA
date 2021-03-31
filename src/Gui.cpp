@@ -6,9 +6,6 @@
 #include <allegro5/allegro_font.h> 
 #include <allegro5/allegro_image.h>
 
-#include <ImGui/imgui.h>
-#include <ImGui/imgui_impl_allegro5.h>
-
 #include "Gui.h"
 #include "config.h"
 
@@ -73,9 +70,6 @@ Gui::Gui()
 	if (!this->initAllegro())
 		return;
 
-	if (!this->initImGui())
-		return;
-
 	this->closeWindow = false;
 
 	for (int i = WF1; i < N_FRAMES; i++)
@@ -123,9 +117,6 @@ Gui::Gui()
 
 Gui::~Gui(void)
 {
-    ImGui_ImplAllegro5_Shutdown();
-    ImGui::DestroyContext();
-
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
 	al_shutdown_primitives_addon();
@@ -180,17 +171,6 @@ bool Gui::initAllegro(void)
 	al_register_event_source(this->evQueue, al_get_display_event_source(this->display));
 	al_register_event_source(this->evQueue, al_get_keyboard_event_source());
 	al_register_event_source(this->evQueue, al_get_mouse_event_source());
-
-	return true;
-}
-
-bool Gui::initImGui(void)
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-
-	ImGui_ImplAllegro5_Init(this->display);
 
 	return true;
 }
@@ -260,7 +240,6 @@ bool Gui::show(void)
 
 void Gui::eventDispatcher(ALLEGRO_EVENT& ev)
 {
-	//ImGui_ImplAllegro5_ProcessEvent(&ev);
 	int index = -1;
 	switch (ev.type)
 	{

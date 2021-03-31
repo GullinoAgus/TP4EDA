@@ -42,7 +42,6 @@ private:
 	World world;
 
 	bool initAllegro();
-	bool initImGui(void);
 	void eventDispatcher(ALLEGRO_EVENT& ev);
 
 	bool startMoving(int keyIndex);
