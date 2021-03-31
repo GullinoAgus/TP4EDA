@@ -4,7 +4,7 @@
 #include "Coordinates.h"
 
 #define WORM_HEIGHT (60)
-#define WORM_WIDTH  (WORM_HEIGHT-20)
+#define WORM_WIDTH  (WORM_HEIGHT-20)    //Cambie esto yo
 
 
 typedef struct {

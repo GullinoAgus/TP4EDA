@@ -346,7 +346,9 @@ bool Gui::wormEvent()
 		if (isValidWormKey(WormsByName::Isaac, key)
 			|| isValidWormKey(WormsByName::Ray, key))
 		{
+#ifdef DEBUG
 			cout << "key: " << key << " time: " << keysDownTime[key] << endl;
+#endif // DEBUG
 			world.update();
 		}
 	}
@@ -410,7 +412,7 @@ bool Gui::drawWorms(void)
 		position.x += PLAYABLE_AREA_X1;	// Set X = 0 relative to playable area
 		position.y += PLAYABLE_AREA_Y2;	// Set Y = 0 relative to playable area
 
-#ifdef DEBUG_FULL
+#ifdef DEBUG
 		WormPointing pointing = wrmarr[i].getPointingDirection();
 		Point_t pointVertex = { 0 };
 		pointVertex.x = position.x;
@@ -432,11 +434,6 @@ bool Gui::drawWorms(void)
 
 		int flip = wrmarr[i].getPointingDirection() == LEFT ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 		int frame = wrmarr[i].getFrame();
-
-		if (!flip)
-		{
-			position.x -= (double)WORM_WIDTH;
-		}
 
 		al_draw_bitmap(this->wormTextArr[frame].bitmap, position.x, position.y, flip);
 

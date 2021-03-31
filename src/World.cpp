@@ -66,7 +66,9 @@ Worm* World::getWormArr(void)
 
 void World::warmUpWorm(WormsByName name, WormActions action, WormPointing direction)
 {
+#ifdef DEBUG
 	std::cout << "Warm up.." << std::endl;
+#endif // DEBUG
 	Worm* worm = getWorm(name);
 	if (worm == NULL) return;
 
@@ -88,8 +90,6 @@ void World::warmUpWorm(WormsByName name, WormActions action, WormPointing direct
 		}
 		worm->setState(state);
 	}
-
-	//worm->update();
 
 	return;
 }
